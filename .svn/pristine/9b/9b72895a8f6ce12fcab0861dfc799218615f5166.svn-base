@@ -1,0 +1,280 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+
+
+
+import kr.nomad.mars.dto.UserBlood;
+import kr.nomad.util.T;
+
+public class UbloodDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper userbloodMapper = new RowMapper() {
+		public UserBlood mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserBlood userblood = new UserBlood();
+			userblood.setBloSeq(rs.getInt("blo_seq"));
+			userblood.setUserId(rs.getString("user_id"));
+			userblood.setBloodTime(rs.getInt("blood_time"));
+			userblood.setBloodKind(rs.getInt("blood_kind"));
+			userblood.setBloodNum(rs.getInt("blood_num"));
+			userblood.setRegDate(rs.getString("reg_date"));
+			return userblood;
+		}
+	};
+	
+	
+	//해당 아이디의 해당 년월 에  측정 수 
+	
+	public int getUserBloodList(String id,String ym) {
+		
+		String query = "SELECT COUNT(*) FROM T_NF_USER_BLOOD "
+				+ "WHERE user_id = ? and substring(convert(varchar(10),reg_date,120), 0, 8) = ?";
+		try {
+				return this.jdbcTemplate.queryForInt(query, new Object[] { id , ym });
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			return -1;
+		}
+		
+	}
+	//기간평균
+	
+	public int getUserBloodavg(String id,String now,String before) { 
+			String query = "" + 
+					"select avg(blood_num) from T_NF_USER_BLOOD where user_id = ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+			return this.jdbcTemplate.queryForInt(query, new Object[] { id,before,now });
+	}
+	
+	//해당아이디 데이터삭제
+	public void deleteUserBlood(String id) {
+		String query = "DELETE FROM T_NF_USER_BLOOD WHERE user_id = ? ";
+		try {
+				this.jdbcTemplate.update(query, new Object[] { id });
+		} catch (Exception e) {
+			
+		}
+		
+	}
+	
+	//혈당측정
+	public void addUserBlood(UserBlood userblood) {
+		String query = "" +
+				"INSERT INTO T_NF_USER_BLOOD " +
+				"	(user_id, blood_time, blood_kind, blood_num, equip, reg_date) " +
+				"VALUES " +
+				"	( ?, ?, ?, ?, ?, getDate()) ";
+		this.jdbcTemplate.update(query, new Object[] {
+		
+			userblood.getUserId(),
+			userblood.getBloodTime(),
+			userblood.getBloodKind(),
+			userblood.getBloodNum(),
+			userblood.getEquip()
+		});
+	}
+	public void addUserBloodWithDate(UserBlood userblood) {
+		String query = "" +
+				"INSERT INTO T_NF_USER_BLOOD " +
+				"	(user_id, blood_time, blood_kind, blood_num, equip, reg_date) " +
+				"VALUES " +
+				"	( ?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+		
+			userblood.getUserId(),
+			userblood.getBloodTime(),
+			userblood.getBloodKind(),
+			userblood.getBloodNum(),
+			userblood.getEquip(),
+			userblood.getRegDate()
+		});
+	}
+
+	public void updateUserBlood(UserBlood userblood) {
+		String query = "" + 
+				"UPDATE T_NF_USER_BLOOD SET " +
+				"	blood_time = ?, " +
+				"	blood_kind = ?, " +
+				"	blood_num = ?, " +
+				"	equip = ? " +
+				"WHERE blo_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			userblood.getBloodTime(),
+			userblood.getBloodKind(),
+			userblood.getBloodNum(),
+			userblood.getEquip(),
+			userblood.getBloSeq()
+		});
+	}
+
+	//유저의 전체 혈당 데이터
+	public List<UserBlood> getUserBlood(String userId) { 
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_USER_BLOOD " +
+				"WHERE user_id = ? ORDER BY BLO_SEQ";
+		return (List<UserBlood>)this.jdbcTemplate.query(query, new Object[] { userId }, this.userbloodMapper);
+	}
+	public UserBlood getUserBlood(String userId, String date) { 
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_USER_BLOOD "
+				+ "	WHERE user_id = ? AND convert(char(10),reg_date,120) = ? ";
+		try {
+			return (UserBlood)this.jdbcTemplate.queryForObject(query, new Object[] { userId, date }, this.userbloodMapper);
+		} catch (Exception e) {
+			return new UserBlood();
+		}
+	}
+
+	public UserBlood getUserBlood(String userId, String date, int kind) { 
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_USER_BLOOD "
+				+ "	WHERE user_id = ? AND convert(char(10),reg_date,120) = ? AND blood_kind = ? ";
+		try {
+			return (UserBlood)this.jdbcTemplate.queryForObject(query, new Object[] { userId, date, kind }, this.userbloodMapper);
+		} catch (Exception e) {
+			return new UserBlood();
+		}
+	}
+
+	
+	/** 유저의 전체 혈당 데이터 갯수 **/
+	public int getCount(String userId) {
+	    String query = " SELECT COUNT(*) FROM T_NF_USER_BLOOD WHERE user_id =  ?  ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] {userId});
+	}
+
+	/** 유저의 전체 혈당 데이터 갯수 **/
+	public int getCount(String userId, String date) {
+	    String query = " SELECT COUNT(*) FROM T_NF_USER_BLOOD WHERE user_id =  ? AND convert(char(10),reg_date,120) = ?  ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] { userId, date });
+	}
+
+	/** 유저의 전체 혈당 데이터 갯수 **/
+	public int getCount(String userId, String date, int kind) {
+	    String query = " SELECT COUNT(*) FROM T_NF_USER_BLOOD WHERE user_id =  ? AND convert(char(10),reg_date,120) = ? AND blood_kind = ?  ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] { userId, date, kind });
+	}
+	
+
+	//해당seq 데이터삭제
+	public void deleteUserBlood(int seq) {
+		String query = "DELETE FROM T_NF_USER_BLOOD WHERE blo_seq = ? ";
+		try {
+				this.jdbcTemplate.update(query, new Object[] { seq });
+		} catch (Exception e) {
+			
+		}
+		
+	}
+    //검색 데이터(차트)
+	public List<UserBlood> getUserBlood(String id,int kind,int page,int itemCountPerPage) { 
+		String con = "";
+		if(kind!=0){
+			con ="and blood_kind="+kind;
+		}
+		String query = ""  
+				+ "SELECT * FROM ("
+				+"select "
+				+ "		ROW_NUMBER() OVER(ORDER BY reg_date desc) as row_seq, "
+				+ "* "
+				+ "from T_NF_USER_BLOOD where user_id = ? "
+				+con
+				+ ") AS a WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") +1 AND "+page+" * "+itemCountPerPage+"";
+		return (List<UserBlood>)this.jdbcTemplate.query(query, new Object[] { id }, this.userbloodMapper);
+	}
+    //차트 갯수
+	public int getBloodcnt(String userId,int kind) { 
+		String con = "";
+		if(kind!=0){
+			con ="and blood_kind="+kind;
+		}
+		String query = ""
+			+ " select count(*) "
+			+ " from T_NF_USER_BLOOD where user_id = ? "
+			+con;
+	
+		return this.jdbcTemplate.queryForInt(query, new Object[] {userId});
+	
+	}
+	
+	//그래프
+	public List<UserBlood> getUserBlood(String id,String now,String before) { 
+			String query = "" + 
+					"select * from T_NF_USER_BLOOD where user_id = ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00' ORDER BY reg_date "; 
+			return (List<UserBlood>)this.jdbcTemplate.query(query, new Object[] { id,before,now },this.userbloodMapper);
+	}
+	public List<UserBlood> getUserBlood(String id,String now,String before, int bloodKind) { 
+		//String query = "select * from T_NF_USER_BLOOD where user_id = ? and blood_kind = ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00' ORDER BY reg_date "; 
+		String query = ""
+				+ "	select 0 as blo_seq, user_id, blood_time, blood_kind, avg(blood_num) as blood_num, convert(char(10), reg_date, 120) as reg_date, 0 as equip "
+				+ "	from T_NF_USER_BLOOD "
+				+ "		where user_id = ? and blood_kind = ? and reg_date between '"+before+" 00:00:00' and '"+now+" 23:59:00'  "
+				+ "	group by user_id, blood_time, blood_kind, convert(char(10), reg_date, 120) "
+				+ "	ORDER BY reg_date "; 
+		return (List<UserBlood>)this.jdbcTemplate.query(query, new Object[] { id, bloodKind },this.userbloodMapper);
+	}
+	
+	//1주 지표 갯수
+	public int getUserBloodcnt(String id,String now,String before) { 
+		String query = ""  
+				+ " select count(distinct(convert(char(10), reg_date, 120))) "
+				+ " from T_NF_USER_BLOOD  where user_id = ? and reg_date between  ? and  ? ";
+		 ; 
+		return this.jdbcTemplate.queryForInt(query, new Object[] { id,before,now });
+	}	
+	
+
+	//타입별 내지표 평균
+	public int getUserBloodavg(String id,String now,String before,int kind) { 
+		String query = "" + 
+				"select avg(blood_num) from T_NF_USER_BLOOD where user_id = ? and blood_kind= ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+		return this.jdbcTemplate.queryForInt(query, new Object[] { id,kind,before,now });
+	}
+	
+	//타입별 내지표 갯수 //관리주기 변경 안내전 판별 
+	public int getUserBloodcnt(String id,String now,String before,int kind) { 
+			String query = ""  
+						+ " select count(distinct(convert(char(10), reg_date, 120))) "
+						+ " from T_NF_USER_BLOOD  where user_id = ? and blood_kind= ? and reg_date between  ? and  ? "; 
+			return this.jdbcTemplate.queryForInt(query, new Object[] { id,kind,before,now });
+	}
+	
+	//타입별 타인지표 평균
+	public int getotherBloodavg(String now,String before,int kind) { 
+		String query = "" + 
+				"select avg(blood_num) from T_NF_USER_BLOOD where blood_kind= ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+		return this.jdbcTemplate.queryForInt(query, new Object[] {kind,before,now });
+	}
+	//타입별 타인지표 갯수
+	public int getotherBloodcnt(String now,String before,int kind) { 
+		String query = "" + 
+				"select COUNT(*) from T_NF_USER_BLOOD where blood_kind= ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+		return this.jdbcTemplate.queryForInt(query, new Object[] {kind,before,now });
+	}
+	
+	/*
+	public int getUBloodcnt(String id,String now,String before,int kind) { 
+				String query = "" + 
+						"select COUNT(*) from T_NF_USER_BLOOD where user_id = ? and blood_kind= ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+				return this.jdbcTemplate.queryForInt(query, new Object[] { id,kind,before,now });
+	}*/
+	
+
+}

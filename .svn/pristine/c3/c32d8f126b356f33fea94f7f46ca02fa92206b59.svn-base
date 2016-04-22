@@ -1,0 +1,53 @@
+package kr.nomad.mars.dto;
+
+public class UserPress {
+	
+	int preSeq = 0;
+	String userId = "";
+	int pulse = 0;
+	int splessure = 0;
+	int dplessure = 0;
+	String regDate = "";
+	String date = "";
+	public int getPreSeq() {
+		return preSeq;
+	}
+	public void setPreSeq(int preSeq) {
+		this.preSeq = preSeq;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public int getPulse() {
+		return pulse;
+	}
+	public void setPulse(int pulse) {
+		this.pulse = pulse;
+	}
+	public int getSplessure() {
+		return splessure;
+	}
+	public void setSplessure(int splessure) {
+		this.splessure = splessure;
+	}
+	public int getDplessure() {
+		return dplessure;
+	}
+	public void setDplessure(int dplessure) {
+		this.dplessure = dplessure;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+	public String getDate() {
+		return regDate.substring(0,10);
+	}
+	
+
+}

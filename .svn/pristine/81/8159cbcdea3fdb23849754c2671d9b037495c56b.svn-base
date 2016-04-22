@@ -1,0 +1,153 @@
+package kr.nomad.mars.dao;
+
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Period;
+import kr.nomad.mars.dto.Pointer;
+import kr.nomad.util.T;
+
+
+public class PeriodDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper periodMapper = new RowMapper() {
+		public Period mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Period period = new Period();
+			period.setPreSeq(rs.getInt("pre_seq"));
+			period.setSort(rs.getInt("sort"));
+			period.setDiseaseId(rs.getString("disease_id"));
+			period.setComment(rs.getString("comment"));
+			period.setKind(rs.getInt("kind"));
+			period.setPseq(rs.getInt("pseq"));
+			period.setAskind(rs.getInt("askind"));
+			period.setMove(rs.getInt("move"));
+			period.setValue(rs.getString("value"));
+			return period;
+		}
+	};
+	
+	public List<Period> getPeriod(int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_PERIOD " +
+				"WHERE askind = 1 and kind= ? "+
+				"ORDER BY sort ASC";
+		return (List<Period>)this.jdbcTemplate.query(query, new Object[] { kind }, this.periodMapper);
+	}
+	
+	public List<Period> getPeriodAnswerList(int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_PERIOD " +
+				"WHERE askind = 2 and kind= ? "+ 
+				"ORDER BY sort ASC ";
+		return (List<Period>)this.jdbcTemplate.query(query, new Object[] { kind }, this.periodMapper);
+	}	
+
+	public Period getPeriodAnswer(String id) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_PERIOD " +
+				"WHERE disease_id = ? " ;
+		
+		try {
+			return (Period)this.jdbcTemplate.queryForObject(query, new Object[] { id }, this.periodMapper);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+	}	
+	
+	///////////////////////////////////
+	
+	public void addPeriod(final Period period) {
+		String query = "" +
+				"INSERT INTO T_NF_DOCTOR_PERIOD " +
+				"	(sort, disease_id, comment, kind, pseq, askind, move, value, is_last) " +
+				"VALUES " +
+				"	( ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			period.getSort(),
+			period.getDiseaseId(),
+			period.getComment(),
+			period.getKind(),
+			period.getPseq(),
+			period.getAskind(),
+			period.getMove(),
+			period.getValue(),
+			period.getIsLast()
+		});
+	}
+
+	public void deletePeriod(int pre_seq) {
+		String query = "DELETE FROM T_NF_DOCTOR_PERIOD WHERE pre_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { pre_seq });
+	}
+
+	public void updatePeriod(Period period) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_PERIOD SET " +
+				"	sort = ?, " +
+				"	disease_id = ?, " +
+				"	comment = ?, " +
+				"	kind = ?, " +
+				"	pseq = ?, " +
+				"	askind = ?, " +
+				"	move = ?, " +
+				"	value = ?, " +
+				"	is_last = ? " +
+				"WHERE pre_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			period.getSort(),
+			period.getDiseaseId(),
+			period.getComment(),
+			period.getKind(),
+			period.getPseq(),
+			period.getAskind(),
+			period.getMove(),
+			period.getValue(),
+			period.getIsLast(),
+			period.getPreSeq()
+		});
+	}
+
+	public Period getPeriodSelect(int pre_seq) {
+		String query = "" + 
+				"SELECT pre_seq, sort, disease_id, comment, kind, pseq, askind, move, value, is_last " +
+				"FROM T_NF_DOCTOR_PERIOD " +
+				"WHERE pre_seq = ? ";
+		return (Period)this.jdbcTemplate.queryForObject(query, new Object[] { pre_seq }, this.periodMapper);
+	}
+
+	public List<Period> getPeriodList(int page, int itemCountPerPage) {
+		String query = "" +
+				"SELECT TOP "+ itemCountPerPage +" pre_seq, sort, disease_id, comment, kind, pseq, askind, move, value, is_last " +
+				"FROM T_NF_DOCTOR_PERIOD " +
+				"WHERE pre_seq <= ( " +
+				"	SELECT MIN(pre_seq) " +
+				"	FROM ( " +
+				"		SELECT TOP "+ ((page-1) * itemCountPerPage + 1) +" pre_seq " +
+				"		FROM T_NF_DOCTOR_PERIOD " +
+				"		ORDER BY pre_seq DESC " +
+				"	) AS A) " +
+				"ORDER BY pre_seq DESC";
+		return (List<Period>)this.jdbcTemplate.query(query, this.periodMapper);
+	}
+	
+	
+
+}

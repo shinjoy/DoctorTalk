@@ -1,0 +1,148 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header5.jsp"  %>
+
+<link rel="stylesheet" href="../lib/kendostatic/kendo.common.min.css" />
+<link rel="stylesheet" href="../lib/kendostatic/kendo.default.min.css" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="../lib/jquery/jquery-2.1.1.min.js"></script>
+<script src="../lib/kendostatic/angular.min.js"></script>
+<script src="../lib/kendostatic/kendo.all.min.js"></script>
+</head>
+
+
+<body style="background-color:#255057;">
+	<div class="deom-section k-content wide">
+	   <div id="chart1" style="height:260px;background-color:#255057;"></div>
+	</div>
+</body>
+<script type="text/javascript">
+function createChart() {
+	
+	var colArr = new Array();
+	var ldlArr = new Array();
+	var hdlArr = new Array();
+	var tgArr = new Array();
+	var periodArr = new Array();
+	
+	 <c:forEach items="${list}" var="item1">
+
+		<c:choose>
+			<c:when test="${item1.col==0}">
+				colArr.push(undefined);
+			</c:when>
+			<c:otherwise>
+				colArr.push("${item1.col}");
+			</c:otherwise>
+		</c:choose>
+		
+		<c:choose>
+			<c:when test="${item1.ldl==0}">
+				ldlArr.push(undefined);
+			</c:when>
+			<c:otherwise>
+				ldlArr.push("${item1.ldl}");
+			</c:otherwise>
+		</c:choose>
+		
+		<c:choose>
+			<c:when test="${item1.hdl==0}">
+				hdlArr.push(undefined);
+			</c:when>
+			<c:otherwise>
+				hdlArr.push("${item1.hdl}");
+			</c:otherwise>
+		</c:choose>
+		<c:choose>
+			<c:when test="${item1.tg==0}">
+				tgArr.push(undefined);
+			</c:when>
+			<c:otherwise>
+				tgArr.push("${item1.tg}");
+			</c:otherwise>
+		</c:choose>
+		
+		periodArr.push("${item1.date}");
+	</c:forEach>
+
+		$("#chart1")
+				.kendoChart(
+						{
+							title : {
+								visible : false
+							},
+							legend : {
+								position : "top"
+							},
+							chartArea : {
+								background : ""
+							},
+							seriesDefaults : {
+								type : "line",
+								style : "smooth"
+							},
+							series : [ {
+								name : "콜레스테롤목표:${goalcol}",
+								data : colArr
+							}, {
+								name : " LDL목표:${goalldl}",
+								data : ldlArr,
+								color : "#32cd32"
+							}, {
+								name : "HDL목표:${goalhdl}",
+								data : hdlArr,
+								color : "#0000FF"
+							}, {
+								name : "중성지방목표:${goaltg}",
+								data : tgArr
+							} ],
+							valueAxis : {
+								labels : {
+									format : "{0}",
+									color : "#ffffff"
+								},
+								line : {
+									visible : false
+								},
+								axisCrossingValue : -10
+							},
+			                categoryAxis: {
+			                    categories: periodArr,
+			                    majorGridLines: {
+			                        visible: false
+			                    },
+			                    labels: {
+			                        rotation: "auto",
+									color : "#ffffff"
+			                    }
+			                },
+			                /*
+							categoryAxis : {
+								categories : [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011], //periodArr,
+								majorGridLines : {
+									visible : false
+								},
+								labels : {
+									rotation : "auto"
+								}
+							},
+							*/
+							tooltip : {
+								visible : true,
+								format : "{0}",
+								template : "#= series.name #: #= value #"
+							}
+						});
+	}
+
+	var graphTimer;
+	$(document).ready(function() {
+		graphTimer = setTimeout(renderGraph, 50);
+	});
+	$(document).bind("kendo:skinChange", createChart);
+	function renderGraph() {
+		createChart();
+		clearTimeout(graphTimer);
+	}
+</script>
+</html>

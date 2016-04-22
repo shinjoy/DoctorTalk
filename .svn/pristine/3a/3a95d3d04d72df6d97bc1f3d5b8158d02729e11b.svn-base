@@ -1,0 +1,52 @@
+package kr.nomad.mars.dto;
+
+public class UserCnt {
+	
+	String userId = "";
+	int bcnt = 30;
+	double pcnt = 4;
+	String regDate = "";
+	int cntSeq = 0;
+	int wcnt = 4;
+	
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public int getBcnt() {
+		return bcnt;
+	}
+	public void setBcnt(int bcnt) {
+		this.bcnt = bcnt;
+	}
+	
+	public double getPcnt() {
+		return pcnt;
+	}
+	public void setPcnt(double pcnt) {
+		this.pcnt = pcnt;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+	public int getCntSeq() {
+		return cntSeq;
+	}
+	public void setCntSeq(int cntSeq) {
+		this.cntSeq = cntSeq;
+	}
+	public int getWcnt() {
+		return wcnt;
+	}
+	public void setWcnt(int wcnt) {
+		this.wcnt = wcnt;
+	}
+
+	
+
+}

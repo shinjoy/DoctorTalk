@@ -1,0 +1,19 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header5.jsp"  %>
+
+</head>
+
+<body class="mobile">
+	<div class="notice-view">
+		<div class="contents-head">
+			<div class="contents-title">${notice.title}</div>
+			<div class="contents-meta">${notice.regDate.substring(0,10)}</div>
+		</div>
+		<div class="contents-contents">
+			${notice.contentsHtml}
+		</div>
+	</div>	
+</body>
+
+</html>

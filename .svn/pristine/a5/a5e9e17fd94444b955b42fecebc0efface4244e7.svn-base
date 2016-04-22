@@ -1,0 +1,183 @@
+/* 로그인 ******************************/
+.wrap {
+	clear:both;
+	width:1200px;
+	height:100%;
+}
+body {
+	background:url("/images/bg.png") repeat-x;
+}
+header {
+	width:100%;
+	height:107px;
+	/*background-color:#384247;*/
+	color:#aaa;
+}
+header .logo {
+	float:left;
+	color:#77ccff;
+	font-weight:bold;
+	margin:30px 20px 0px;
+}
+header .right-side {
+	float:right;
+	margin:15px 0;
+}
+aside {
+	float:left;
+	width:180px;
+	height:100%;
+	background-color:#cdcdcd;
+}
+aside .top-deco {
+	width:100%;
+	height:5px;
+	background-color:#d91b22;
+}
+
+aside nav ul li {
+	background-color:#cdcdcd;
+	width:100%;
+	height:46px;
+	cursor:pointer;
+	font-size:16px;
+	font-family:"Nanum Gothic", sans-serif, "Malgun Gothic","맑은 고딕", "Titillium Web", sans-serif;
+	border-top:1px solid #eee;
+	border-bottom:1px solid #aaa;
+}
+aside nav ul li.active {
+	background-color:#737373;
+	border-top:1px solid #555;
+	border-bottom:1px solid #555;
+}
+aside nav ul li span {
+	display:block;
+	height:24px;
+	margin:15px 20px 0;
+	text-align:right;
+	/*text-shadow:1px 1px 1px #333;*/
+	color:#555;
+	font-weight:bold;
+}
+aside nav ul li span:hover {
+	color:#eee;
+}
+aside nav ul li.active span {
+	color:#fff;
+}
+
+.tab {
+	width:100%;
+	height:39px;
+	border-bottom:1px solid #1cabac;
+}
+.tab ul li {
+	float:left;
+	height:38px;
+	width:100px;
+	background:#f8f8f8;
+	cursor:pointer;
+	border-left:1px solid #bbb;
+	border-right:1px solid #bbb;
+	border-top:1px solid #bbb;
+}
+.tab ul li span {
+	display:block;
+	margin:10px 0 8px;
+	text-align:center;
+	font-weight:bold;
+	color:#1cabac;
+	font-size:14px;
+}
+.tab ul li.active, .tab ul li:hover {
+	border-right:1px solid #1cabac;
+	border-left:1px solid #1cabac;
+	border-top:3px solid #1cabac;
+	background:#fff;
+	height:37px;
+}
+.tab ul li.active span, .tab ul li:hover span {
+	color:#1cabac;
+}
+.tab-list-top-tool {
+	background-color:#999;
+	padding:10px 20px;
+	height:26px;
+}
+
+
+article {
+	float:right;
+	width:1000px;
+	margin:30px 0 100px;
+}
+
+footer {
+	position:relative; 
+	margin-top:-40px;
+	height: 40px;
+	clear:both;
+	width: 100%;
+	background-color: #888;
+}
+/*
+footer {
+	position: absolute;
+	bottom: 0px;
+	clear:both;
+	width: 100%;
+	height: 40px;
+	background-color: #888;
+}
+*/
+footer .copyright {
+	padding:14px 0 0 0;
+	color:#eee;
+}
+footer .copyright .logo {
+	font-weight:bold;
+}
+
+.list-top-tool {
+	height:30px;
+	margin:14px 0 10px;
+}
+.left-side {
+	float:left;
+}
+.right-side {
+	float:right;
+}
+
+img.list-thumb {
+	height:40px;
+}
+img.info-thumb {
+	width:150px;
+}
+img.gallery-thumb {
+	width:200px;
+}
+
+.tool-box {
+	clear:both;
+	padding:10px 0;
+	text-align:center;
+}
+
+.view-box {
+	border:3px solid #ddd;
+	padding:20px;
+}
+.view-box h2 {
+	font-size:14px;
+	font-weight:bold;
+	margin-bottom:20px;
+}
+.view-box .img-box {
+	float:left;
+}
+.view-box .info-box {
+	float:right;
+	width:780px;
+}

@@ -1,0 +1,249 @@
+var isTodoEditor = false;
+var isWorkboardEditor = false;
+
+$(document).keydown(function(event) {
+	//19 for Mac Command+S
+	if (!( String.fromCharCode(event.which).toLowerCase() == 's' && event.ctrlKey) && !(event.which == 19)) return true;
+	
+	if (isTodoEditor) {
+		onTodoEdit();
+	}
+	if (isWorkboardEditor) {
+		workboarForm.submit();
+	}
+	
+	event.preventDefault();
+	return false;
+});
+
+function setWorkboardEditor() {
+	isWorkboardEditor = true;
+}
+
+function logout() {
+	$.ajax({
+		type:"POST",
+		url:"/m_logout.go",
+		dataType:"html",
+		success:function(msg){
+			var json = JSON.parse(msg);
+			if (json.result) {
+				document.location.href = "/login.go";
+			} else {
+				alert(json.message);
+			}
+		}
+	});
+}
+
+function onProjectEdit(frm) {
+	if (frm.projectName.value == "") {
+		alert("프로젝트 명을 입력하세요.");
+		return false;
+	}
+	frm.action = "/project_edit_do.go";
+	frm.submit();
+	
+	return false;
+}
+
+function changed() {
+	$("#todoEditBtn").removeClass("gray");
+	$("#todoEditBtn").addClass("orange");
+}
+
+function onTodoEdit() {
+	var frm = todoForm;
+	/*
+	if (frm.todoComment.value == "" && frm.todoResult.value == "") {
+		alert("내용을 입력하세요.");
+		return false;
+	}
+	*/
+	var param = "";
+	param += "processSeq="+frm.processSeq.value+"&year="+frm.year.value+"&month="+frm.month.value+"&date="+frm.date.value;
+	param += "&seq="+frm.seq.value+"&todoComment="+frm.todoComment.value;
+
+	$.ajax({
+		type:"POST",
+		url:"/todo_edit_do.go",
+		dataType:"html",
+		data:param,
+		success:function(msg){
+			var json = JSON.parse(msg);
+			try {
+				$("#todoEditBtn").removeClass("orange");
+				$("#todoEditBtn").addClass("gray");
+				if (frm.todoComment.value == "") {
+					$("#mat_"+frm.processSeq.value+"_"+frm.date.value).html("&nbsp;");
+				} else {
+					$("#mat_"+frm.processSeq.value+"_"+frm.date.value).html("<span>●</span>");
+				}
+				/*
+				if (confirm(json.message+"\n창을 닫으려면 확인을 클릭하세요.")) {
+					closePopupLayer();
+				}
+				*/
+			} catch (e) {
+				alert(e);
+			}
+		}
+	});
+	return false;
+}
+
+function deleteTodo(seq) {
+	var frm = todoForm;
+	var param = "";
+	param += "processSeq="+frm.processSeq.value+"&year="+frm.year.value+"&month="+frm.month.value+"&date="+frm.date.value;
+	param += "&seq="+seq;
+	closePopupLayer();
+	$.ajax({
+		type:"POST",
+		url:"/todo_delete_do.go",
+		dataType:"html",
+		data:param,
+		success:function(msg){
+			showPopup(msg, x, y);
+		}
+	});
+}
+
+var matrixId;
+window.addEventListener("load", function() {
+	$(".matrix").bind("click",function(event) {
+		matrixId = this.id;
+		var frm = dashboardForm;
+		var processSeq = matrixId.split("_")[1];
+		var date = matrixId.split("_")[2];
+		var year = frm.year.value;
+		var month = frm.month.value;
+		var x = event.pageX;
+		var y = event.pageY;
+
+		var param = "processSeq="+processSeq+"&year="+year+"&month="+month+"&date="+date;
+		if (event.ctrlKey) {
+			$.ajax({
+				type:"POST",
+				url:"/m_schedule_edit_do.go",
+				dataType:"html",
+				data:param,
+				success:function(msg){
+					var json = JSON.parse(msg);
+					if (json.result) {
+						if (json.message == "inserted") {
+							$("#"+matrixId).addClass("day-todo");
+						} else if (json.message == "deleted") {
+							$("#"+matrixId).removeClass("day-todo");
+						}
+					} else {
+						alert(json.message);
+					}
+				}
+			});
+		} else {
+			var popTitle;
+			var content;
+			$.ajax({
+				type:"POST",
+				url:"/todo_edit.go",
+				dataType:"html",
+				data:param,
+				success:function(msg){
+					showPopup(msg, x, y);
+				}
+			});
+		}
+	});
+});
+
+
+function showPopup(content, x, y) {
+	var maskHeight = $(document).height();
+	var maskWidth = $(window).width();
+	var popWidth = 740;
+	var popX;
+	var popY;
+	
+	if (x > maskWidth/2) {
+		popX = x - popWidth;
+	} else {
+		popX = x;
+	}
+	popX = maskWidth/2 - popWidth/2;
+	popY = y + 40;
+	
+	$("#"+matrixId).addClass("day-selected");
+	
+	$("#window").css("display","block");
+	$("#window").html(content);
+	$("#window").css({'left':popX,'top':popY, 'position':'absolute', 'width':popWidth});
+
+	//마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채운다.
+	$("#window-mask").css({'width':maskWidth,'height':maskHeight});
+	
+	//애니메이션 효과 - 일단 1초동안 까맣게 됐다가 80% 불투명도로 간다.
+	//$(element).fadeIn(1000);
+	$("#window-mask").fadeTo("fast",0.5);
+	//$("#window-mask").show();
+
+	//팝업을 띄운다.
+	$("#window").show();
+	isTodoEditor = true;
+}
+
+
+
+function onWorkboardEdit(frm) {
+	/*
+	if (frm.todoComment.value == "" && frm.todoResult.value == "") {
+		alert("내용을 입력하세요.");
+		return false;
+	}
+	*/
+	oEditors.getById["ir1"].exec("UPDATE_CONTENTS_FIELD", []);
+	getPlainText(frm);
+
+	var param = "";
+	param += "bbsSeq="+frm.bbsSeq.value+"&userId="+frm.userId.value+"&userName="+frm.userName.value;
+	param += "&projectCode="+frm.projectCode.value+"&role="+frm.role.value+"&targetIds="+frm.targetIds.value+"&status="+frm.status.value;
+	param += "&bbsTitle="+frm.bbsTitle.value+"&ir1_text="+frm.ir1_text.value+"&ir1="+frm.ir1.value+"&workboard_file="+frm.workboard_file.value;
+
+	$.ajax({
+		type:"POST",
+		url:"/workboard_edit_do.go",
+		dataType:"html",
+		data:param,
+		success:function(msg){
+			var json = JSON.parse(msg);
+			try {
+				alert(json.message);
+			} catch (e) {
+				alert(e);
+			}
+		}
+	});
+	return false;
+}
+
+
+
+/**
+ * 팝업 레이어와 마스크를 닫는다.
+ * @param popupElement
+ * @param maskElement
+ */
+function closePopupLayer(){
+	if (isTodoEditor) {
+		onTodoEdit();
+	}
+
+	$("#"+matrixId).removeClass("day-selected");
+	$("#window, #window-mask").hide();
+	$(popContent).html($("#windowContents").html());
+	$("#windowContents").html("");
+	BB_enableUnderModal();
+	
+	isTodoEditor = false;
+}
+

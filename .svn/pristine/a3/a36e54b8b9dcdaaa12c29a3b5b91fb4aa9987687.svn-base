@@ -1,0 +1,159 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ include file="/WEB-INF/views/common/header.jsp"  %>
+
+<script type="text/javascript">
+	
+	$(document).ready(function() {
+// 		aside.setActive(3,1);
+ 		aside.setActive(2,3);
+	});
+
+	/* 저장 */
+	function submitForm(frm) {
+
+// 		if (frm.goalSmblood.value == "") {
+// 			alert("카테고리를 입력해 주세요.");
+// 			return false;
+// 		}
+
+		var param = {
+				indexSeq : frm.indexSeq.value,
+				goalSmblood : frm.goalSmblood.value,
+				goalBmblood : frm.goalBmblood.value,
+				goalEblood : frm.goalEblood.value,
+				goalSblood : frm.goalSblood.value,
+				goalHba : frm.goalHba.value,
+				goalSpre : frm.goalSpre.value,
+				goalBpre : frm.goalBpre.value,
+				goalPul : frm.goalPul.value,
+				goalCol : frm.goalCol.value,
+				goalLdl : frm.goalLdl.value,
+				goalHdl : frm.goalHdl.value,
+				goalTg : frm.goalTg.value
+		};
+		//console.log(param);
+		$.ajax({
+			type:"POST",
+			url:"/admin/notice/manage_index_edit_do.go",
+			dataType:"json",
+			data:param,
+			success:function(json) {
+				alert(json.message);
+				if(json.result) {
+					document.location.reload();
+				}
+			}
+		});
+	}
+
+
+	
+</script>
+
+<style>
+	table.cat { margin-left:20px; }
+	table.cat td { padding-bottom:10px; }
+	td h2 { margin-top:10px; }
+</style>
+
+</head>
+<body>
+
+<%@ include file="/WEB-INF/views/admin/admin_header.jsp"  %>
+
+<section class="main-cover main-row">
+	<section id="main">
+		
+		<%@ include file="/WEB-INF/views/admin/admin_menu.jsp"  %>
+
+		<section id="contents">
+			<header class="panel">
+				 ■ 홈 > 서비스관리 > 관리지표 등록
+			</header>
+		
+			<div class="contents-block">
+			
+				<h1>관리지표 등록</h1>
+				
+				<div>
+					<form method="post" name="printcenterForm" onsubmit="return submitForm(this); return false;">
+
+						<div style="float:left;">				
+							<table class="cat">	
+								<thead>
+									<form method="post" name="parentseqForm">
+										<tr>
+											<td><h2>관리지표</h2></td>	
+											<td>
+												&nbsp;
+											</td>
+										</tr>
+									</form>
+								</thead>
+								<tbody>
+									<c:choose>
+										<c:when test="${manageIndex.size() > 0}">
+											<c:forEach var="it" items="${manageIndex}">
+												<input type="hidden" name="indexSeq" value="${it.indexSeq}">	
+													<tr>
+														<td><span style="font-weight:bold; margin:5px;">아침공복혈당</span>
+															<input type="text" class="itext" name="goalSmblood" value="${it.goalSmblood}"> mg/dL  -
+															<input type="text" class="itext" name="goalBmblood" value="${it.goalBmblood}"> mg/dL 
+														</td>
+													</tr>
+													<tr>
+														<td>
+														<span style="font-weight:bold; margin:5px 30px 5px 5px;">식후혈당</span>
+														<input type="text" class="itext" name="goalEblood" value="${it.goalEblood}"> mg/dL 
+														</td>
+													</tr>
+													<tr>
+													<td>
+													<span style="font-weight:bold; margin:5px 20px 5px 5px;">취침전혈당</span>
+													<input type="text" class="itext" name="goalSblood" value="${it.goalSblood}"> mg/dL </td></tr>
+													<tr>
+														<td><span style="font-weight:bold; margin:5px 20px 5px 5px;">당화혈색소</span>
+															<input type="text" class="itext" name="goalHba" value="${it.goalHba}"> %
+														</td>
+													</tr>
+													<tr>													
+														<td><span style="font-weight:bold; margin:5px 56px 5px 5px;">혈압</span>
+															<input type="text" class="itext" name="goalSpre" value="${it.goalSpre}"> mmHg -
+															<input type="text" class="itext" name="goalBpre" value="${it.goalBpre}"> mmHg
+														</td>
+													</tr>
+													<tr><td><span style="font-weight:bold; margin:5px 56px 5px 5px;">맥박</span>
+													<input type="text" class="itext" name="goalPul" value="${it.goalPul}"> 회</td></tr>
+													<tr><td><span style="font-weight:bold; margin:5px 20px 5px 5px;">콜레스테롤</span>
+													<input type="text" class="itext" name="goalCol" value="${it.goalCol}"> ㎎/㎗</td></tr>
+													<tr><td><span style="font-weight:bold; margin:5px 30px 5px 5px;">저밀도 콜레스테롤</span>
+													<input type="text" class="itext" name="goalLdl" value="${it.goalLdl}"> ㎎/㎗</td></tr>
+													<tr><td><span style="font-weight:bold; margin:5px 30px 5px 5px;">고밀도 콜레스테롤</span>
+													<input type="text" class="itext" name="goalHdl" value="${it.goalHdl}"> ㎎/㎗</td></tr>
+													<tr><td><span style="font-weight:bold; margin:5px 30px 5px 5px;">중성지방</span>
+													<input type="text" class="itext" name="goalTg" value="${it.goalTg}"> ㎎/㎗</td></tr>
+											</c:forEach>
+										</c:when>	
+									</c:choose>
+								</tbody>
+							</table>
+							
+							<div style="margin:10px 0px 0px 250px;">
+								<button type="submit" class="btn-blue" >수정</button>			
+								<button type="button" class="btn-red" onclick="deleteForm(${it.indexSeq});">삭제</button>
+							</div>	
+						</div>
+					</form>	
+				</div>
+
+				</div>
+		</section>
+	</section>
+</section>
+
+<%@ include file="/WEB-INF/views/admin/admin_footer.jsp"  %>
+
+</body>
+</html>

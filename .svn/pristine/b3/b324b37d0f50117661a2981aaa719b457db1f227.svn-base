@@ -1,0 +1,159 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Comment;
+import kr.nomad.mars.dto.Cvrisk;
+
+public class CommentDao {
+
+	private JdbcTemplate jdbcTemplate;
+
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper commentMapper = new RowMapper() {
+		public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Comment comment = new Comment();
+			comment.setCommentSeq(rs.getInt("comment_seq"));
+			comment.setCommentCode(rs.getInt("comment_code"));
+			comment.setCommnet(rs.getString("commnet"));
+			return comment;
+		}
+	};
+
+	public Comment getComment(int commentCode) {
+		String query = "" + "SELECT * " + "FROM T_NF_DOCTOR_COMMENT "
+				+ "WHERE comment_code = ? ";
+		try {
+			return (Comment) this.jdbcTemplate.queryForObject(query,
+					new Object[] { commentCode }, this.commentMapper);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	
+	
+	
+	
+	/////////////////////
+	
+	
+	public void addComment(final Comment comment) {
+		String query = "" +
+				"INSERT INTO T_NF_DOCTOR_COMMENT " +
+				"	(comment_code, commnet) " +
+				"VALUES " +
+				"	(?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			comment.getCommentCode(),
+			comment.getCommnet()
+		});
+	}
+
+	public void deleteComment(int comment_seq) {
+		String query = "DELETE FROM T_NF_DOCTOR_COMMENT WHERE comment_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { comment_seq });
+	}
+
+	public void updateComment(Comment comment) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_COMMENT SET " +
+				"	sort = ?, " +
+				"	pseq = ?, " +
+				"WHERE comment_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+				comment.getCommentCode(),
+				comment.getCommnet(),
+				comment.getCommentSeq()
+		});
+	}
+
+	public Comment getCommentList(int comment_seq) {
+		String query = "" + 
+				"SELECT *  " +
+				"FROM T_NF_DOCTOR_COMMENT " +
+				"WHERE cv_seq = ? ";
+		try {
+			return (Comment)this.jdbcTemplate.queryForObject(query, new Object[] { comment_seq }, this.commentMapper);
+		} catch (Exception e) {
+			return new Comment();
+		}
+	}
+
+	
+	// 테이블 내용 수정 처리 
+	public void updateComment(String comment, int comment_seq) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_COMMENT SET " +
+				"	commnet = ? " +
+				"WHERE comment_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {comment ,comment_seq});
+	}
+	
+	// 정렬값 변경
+/*	public void updateComment(int sort ,int comment_seq) { 
+		
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_COMMENT SET " +
+				"	sort = ? " +
+				" WHERE comment_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {sort,comment_seq});
+	}
+	
+	
+	// 체크값 변경
+	public void updateCommentIsLast(int is_last ,int comment_seq) { 
+		
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_COMMENT SET " +
+				"	is_last = ? " +
+				" WHERE comment_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {is_last,comment_seq});
+	}
+*/	
+	
+
+	public List<Comment> getCommentList(int page, int itemCountPerPage) {
+		
+		List<Comment> result = null;
+
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "	SELECT "
+				+ "		ROW_NUMBER() OVER(ORDER BY comment_seq asc ) AS row_seq, "
+				+ "		* "
+				+ "	FROM T_NF_DOCTOR_COMMENT"
+				+ ") AS row WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") + 1 AND "+page+" * "+itemCountPerPage+" ";
+				
+		result = (List<Comment>)this.jdbcTemplate.query(query, this.commentMapper);
+		
+		return result;
+	}
+	
+	
+	public int getCount() {
+		int result = 0;		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_DOCTOR_COMMENT ";
+		result = this.jdbcTemplate.queryForInt(query);
+				
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+
+}

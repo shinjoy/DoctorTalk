@@ -1,0 +1,144 @@
+@charset "utf-8";
+
+html, body { margin: 0; padding: 0; height:100%; }
+
+input { margin: 0; padding: 0; }
+.reset { margin: 0 !important; padding: 0 !important; }
+/* fontStyle */ tt, i, b, u, s, strike, big, small, 
+/* phrase */ em, strong, dfn, code, samp, kbd, var, cite, abbr, acronym,
+/* special */ a, img, applet, object, font, basefont, br, script, map, q, sub, sup, span, bdo, iframe, 
+/* formctrl */ input, select, textarea, label, button, 
+/* document */ address, div, 
+p, h1, h2, h3, h4, h5, h6, pre, blockquote, ins, del, dl, dt, dd, ul, ol, li, dir, menu, form, option, fieldset, legend, th, td { margin: 0; padding: 0; }
+table { border-collapse: collapse; margin: 0; padding: 0; border: 0; border-spacing: 0;}
+hr { margin: 50px; }
+img { font-size: 1%; line-height: 1;
+	border: 0;
+	vertical-align: top;
+}
+ul, ol, li { list-style: none; }
+button { margin: 0; padding: 0; border: 0; line-height: 1; background: transparent; vertical-align: top; cursor:pointer; }
+
+a { -webkit-tap-highlight-color:transparent; }
+input, button, textarea { outline:none; }
+a:link { color: #000; text-decoration: none; }
+a:visited { color: #000; }
+a:hover { color: #000; }
+a:active { color: #000; }
+
+.clearfix:after { content: ""; display: block; clear: both;}
+/* IE 6/7 */
+.clearfix { zoom: 1; }
+
+body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-style: normal;
+	font-size: 12px; 
+	font-family: NanumBarunGothic, '맑은 고딕', sans-serif;
+	line-height: 1.5;
+	color: #000;
+	height :100%;
+}
+body.small { font-size:11px;}
+body.big { font-size:14px;}
+body.huge { font-size:16px;}
+
+body.chat-body { background-color:#fff; }
+
+/* 상단툴바 */
+header.toolbar { position:fixed; top:0; padding:8px 8px; height:25px; border-bottom:1px solid #aaa; background-color:#f5f5f5; width:calc(100% - 16px); }
+header.toolbar .tool-table { display:table; width:100%; height:20px; }
+header.toolbar .tool-table .header-left { display:table-cell; vertical-align:middle; }
+header.toolbar .tool-table .header-div { display:table-cell; width:1px; background-color:#eee; margin:0 5px; }
+header.toolbar .tool-table .header-right { display:table-cell; text-align:right; padding:0 2px; vertical-align:middle; width:32px; }
+
+header.toolbar .tool-table .header-left .search-tool { display:table; width:100%; }
+header.toolbar .tool-table .header-left .search-tool .search-box { display:table-cell; width:calc(100% - 50px); }
+header.toolbar .tool-table .header-left .search-tool .search-btn { display:table-cell; vertical-align:top; width:70px; text-align:right; }
+header.toolbar .tool-table .header-left .search-tool .search-btn button { color:#0096ff; font-size:16px; font-weight:bold; padding:5px 3px; }
+
+header.toolbar .search-box { border-radius:4px; padding:3px; margin-right:3px; background-color:#fff; }
+header.toolbar .search-box.gray { background-color:#eee; }
+header.toolbar .search-box .search-icon { padding:3px 0 0 5px; }
+header.toolbar .search-box input { background-color:rgba(255,255,255,0); border:0; width:calc(100% - 30px); }
+
+header.toolbar.gray { background-color:#fcfcfc; }
+header.toolbar.gray .search-box { border:1px solid #dadada; background-color:#fff; }
+header.toolbar.shadow { box-shadow:0 1px 1px #ccc; }
+
+/* 채팅 */
+.chat { padding:60px 10px 20px; margin-bottom:20px; }
+.chat .line { background-image:url('/images/chat_line.png'); background-repeat:repeat-x; background-position:center; text-align:center; width:100%; margin:10px 0; clear:both; }
+.chat .line .date-info { display:inline-block; padding:0 10px; background-color:#fff; color:#145383; }
+.bottom-margin { clear:both; height:20px;}
+
+.photo { display:table-cell; width:40px; height:40px; border-radius:25px; border:1px solid #aaa; background-color:#6596bc; background-position:center; background-size:cover; background-repeat:no-repeat; }
+.photo-big-chat { width:60px; height:60px; border-radius:32px; border:1px solid #aaa; background-color:#6596bc; background-position:center; background-size:cover; background-repeat:no-repeat; }
+.photo-big { width:60px; height:60px; border-radius:32px; border:1px solid #aaa; background-color:#6596bc; background-position:center; background-size:cover; background-repeat:no-repeat; }
+.chat-comment img { max-width:100%; vertical-align:text-bottom; }
+
+.bubble-comment { display:table; margin-top:10px; float:left; clear:both; }
+.bubble-comment .buddy-photo { display:table-cell; width:42px; }
+.bubble-comment .name-bubble { display:table-cell; padding-left:5px; }
+.bubble-comment .name-bubble .buddy-name { font-size:1.2em; font-weight:bold; padding:0 0 2px 8px; }
+.bubble-comment .name-bubble .buddy-bubble { display:table; }
+.bubble-comment .name-bubble .buddy-bubble .arrow-left { display:table-cell; vertical-align:top; padding-top:3px; }
+.bubble-comment .name-bubble .buddy-bubble .chat-comment { display:table-cell; border-radius:3px; background-color:#f1f1f1; padding:6px 10px; box-shadow:1px 1px 1px #ccc; max-width:210px; }
+.bubble-comment .name-bubble .buddy-bubble .chat-comment-hidden { display:none; }
+.bubble-comment .name-bubble .buddy-bubble .chat-comment .searched { display:inline-block; background-color:#faa; }
+.bubble-comment .name-bubble .buddy-bubble .chat-comment .searched.bold { font-weight:bold; }
+
+.bubble-comment .reg-date { display:table-cell; vertical-align:bottom; width:60px; padding-left:5px; color:#999; }
+.bubble-comment .reg-date .no-read { display:inline-block; color:#f40; }
+
+.my-comment { display:table; margin-top:10px; float:right; clear:both; }
+.my-comment .buddy-photo { display:table-cell; }
+.my-comment .name-bubble { display:table-cell; padding-left:5px; }
+.my-comment .name-bubble .buddy-name { font-size:14px; font-weight:bold; padding:0 0 2px 8px; }
+.my-comment .name-bubble .buddy-bubble { display:table; }
+.my-comment .name-bubble .buddy-bubble .arrow-left { display:table-cell; vertical-align:bottom; }
+.my-comment .name-bubble .buddy-bubble .chat-comment { display:table-cell; color:#fff; border-radius:3px; background-color:#37a7e4; padding:6px 10px; box-shadow:1px 1px 1px #ccc; max-width:300px; }
+.my-comment .name-bubble .buddy-bubble .chat-comment-hidden { display:none; }
+.my-comment .name-bubble .buddy-bubble .chat-comment .searched { display:inline-block; background-color:#faa; }
+.my-comment .name-bubble .buddy-bubble .chat-comment .searched.bold { font-weight:bold; }
+
+.my-comment .fail-btn { display:none; vertical-align:bottom; width:60px; padding-right:3px; text-align:right; }
+.my-comment .reg-date { display:table-cell; vertical-align:bottom; padding:0 3px 0 5px; text-align:right; width:60px; color:#999; }
+.my-comment .reg-date .no-read { display:inline-block; color:#f40; }
+
+
+.chat-comment .item-link { display:inline-block; border:1px solid #5af; border-radius:2px; background-color:#cdf; padding:0 3px; }
+.msg-key {width:0;height:0;opacity:0;}
+.link { text-decoration: underline; }
+.link a { color:#0055DD; }
+.img { max-width:200px; }
+.star { color:#ccc; }
+.star.active { color:#f40; }
+
+ul.context { position:fixed; display:none; border:1px solid #aaa; width:80px; background-color:#eaeaea; }
+ul.context li { border-bottom:1px solid #aaa; padding:3px; text-align:center; cursor:pointer; }
+ul.context li:last-child { border-bottom:0; }
+ul.context li:hover { background-color:#fff; }
+
+
+.chat-list { width:100%; cursor:pointer; }
+.chat-list .photo-cell { width:40px; padding:10px; }
+.chat-list .bold { font-weight:bold; }
+.chat-list .gray { color:#aaa; }
+.chat-list .underline { border-bottom:1px solid #ddd; padding:10px; }
+.chat-list .profile { width:40px; height:40px; background-size:cover; background-repeat:no-repeat; background-position:center; border-radius:22px; }
+
+.chat-list .photo-cell.sm { width:20px; padding:10px; }
+.chat-list .profile.sm { width:20px; height:20px; background-size:cover; background-repeat:no-repeat; background-position:center; border-radius:12px; }
+
+.bubble-comment .name-bubble .buddy-bubble .chat-comment-hidden { display:none; }
+.bubble-comment .name-bubble .buddy-bubble .chat-comment .searched { display:inline-block; background-color:#fdd; } /*CSG:20160120: background-color:#faa; */
+.bubble-comment .name-bubble .buddy-bubble .chat-comment .searched.bold { font-weight:bold; color:#f00; }
+
+.bubble-comment .name-bubble .sticker .chat-comment .searched { display:inline-block; background-color:#faa; }
+.bubble-comment .name-bubble .sticker .chat-comment .searched.bold { font-weight:bold; }
+
+.bubble-comment .name-bubble .gallery .chat-comment .searched { display:inline-block; background-color:#faa; }
+.bubble-comment .name-bubble .gallery .chat-comment .searched.bold { font-weight:bold; }

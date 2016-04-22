@@ -1,0 +1,188 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.MedExam;
+
+
+
+public class MedExamDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper medexamMapper = new RowMapper() {
+		public MedExam mapRow(ResultSet rs, int rowNum) throws SQLException {
+			MedExam medexam = new MedExam();
+			medexam.setMedSeq(rs.getInt("med_seq"));
+			medexam.setSort(rs.getInt("sort"));
+			medexam.setComment(rs.getString("comment"));
+			medexam.setValue(rs.getString("value"));
+			medexam.setKind(rs.getInt("kind"));
+			medexam.setAskind(rs.getInt("askind"));
+			medexam.setPseq(rs.getInt("pseq"));
+			medexam.setMove(rs.getInt("move"));
+			medexam.setAnsType(rs.getInt("ans_type")); 
+			medexam.setQtype(rs.getString("qtype"));
+			medexam.setIsLast(rs.getInt("is_last"));
+			return medexam;
+		}
+	};
+
+	public List<MedExam> getMedExamList(int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_MED_EXAM " +
+				"WHERE askind = 1 and kind = ? "+
+				"ORDER BY sort ASC ";
+	
+			return (List<MedExam>)this.jdbcTemplate.query(query, new Object[] { kind },this.medexamMapper);
+	
+	}
+
+	public List<MedExam> getMedExamAnswerList(int pseq,int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_MED_EXAM " +
+				"WHERE pseq = ? and kind= ? "+
+				"ORDER BY sort ASC ";
+		return (List<MedExam>)this.jdbcTemplate.query(query, new Object[] { pseq,kind }, this.medexamMapper);
+	}
+	/////////////////////////////////
+	
+	public void addMedExam(final MedExam medexam) {
+		String query = "" +
+				"INSERT INTO T_NF_MED_EXAM " +
+				"	(sort, comment, value, askind, pseq, move, ans_type, qtype,is_last) " +
+				"VALUES " +
+				"	( ?, ?, ?, ?, ?, ?,?,?,?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			medexam.getSort(),
+			medexam.getComment(),
+			medexam.getValue(),
+			medexam.getAskind(),
+			medexam.getPseq(),
+			medexam.getMove(),
+			medexam.getAnsType(),
+			medexam.getQtype(),
+			medexam.getIsLast()
+		});
+	}
+
+	public void deleteMedExam(int med_seq) {
+		String query = "DELETE FROM T_NF_MED_EXAM WHERE med_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { med_seq });
+	}
+
+	public void updateMedExam(MedExam medexam) { 
+		String query = "" + 
+				"UPDATE T_NF_MED_EXAM SET " +
+				"	sort = ?, " +
+				"	comment = ?, " +
+				"	value = ?, " +
+				"	askind = ?, " +
+				"	pseq = ?, " +
+				"	move = ? " +
+				"	ans_type = ?, " +
+				"	qtype = ? "+ 
+				" 	is_last = ? " +
+				"WHERE med_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			medexam.getSort(),
+			medexam.getComment(),
+			medexam.getValue(),
+			medexam.getAskind(),
+			medexam.getPseq(),
+			medexam.getMove(),
+			medexam.getMedSeq(),
+			medexam.getAnsType(),
+			medexam.getIsLast(),
+			medexam.getQtype()
+		});
+	}
+	
+	
+	// 테이블 내용 수정 처리 
+	public void updateMedExam(String comment, int medSeq) { 
+		String query = "" + 
+				"UPDATE T_NF_MED_EXAM SET " +
+				"	comment = ? " +
+				"WHERE med_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {comment ,medSeq});
+	}
+	
+	// 정렬값 변경
+	public void updateMedExam(int sort ,int medSeq) { 
+		
+		String query = "" + 
+				"UPDATE T_NF_MED_EXAM SET " +
+				"	sort = ? " +
+				" WHERE med_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {sort,medSeq});
+	}
+	
+	// 체크값 변경
+	public void updateMedExamIsLast(int is_last ,int medSeq) { 
+		
+		String query = "" + 
+				"UPDATE T_NF_MED_EXAM SET " +
+				"	is_last = ? " +
+				" WHERE med_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {is_last,medSeq});
+	}
+	
+	
+	
+	public MedExam getMedExam(int med_seq) {
+		String query = "" + 
+				"SELECT med_seq, sort, comment, value, askind, pseq, move, value, ans_type, qtype" +
+				"FROM T_NF_MED_EXAM " +
+				"WHERE med_seq = ? ";
+
+		try {
+			return (MedExam)this.jdbcTemplate.queryForObject(query, new Object[] { med_seq }, this.medexamMapper);
+		} catch (Exception e) {
+			return new MedExam();
+		}
+		
+	}
+
+	public List<MedExam> getMedExamList(int page, int itemCountPerPage) {
+		
+		List<MedExam> result = null;
+
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "	SELECT "
+				+ "		ROW_NUMBER() OVER(ORDER BY sort asc) AS row_seq, "
+				+ "		* "
+				+ "	FROM T_NF_MED_EXAM "
+				+ ") AS row WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") + 1 AND "+page+" * "+itemCountPerPage+" ";
+				
+		result = (List<MedExam>)this.jdbcTemplate.query(query, this.medexamMapper);
+		
+		return result;
+	}
+	
+	
+	public int getCount() {
+		int result = 0;		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_MED_EXAM ";
+		result = this.jdbcTemplate.queryForInt(query);
+				
+		return result;
+	}
+	
+	
+	
+}

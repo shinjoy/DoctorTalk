@@ -1,0 +1,126 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.UserBasic;
+
+import kr.nomad.util.T;
+
+public class UBasicDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper userbasicMapper = new RowMapper() {
+		public UserBasic mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserBasic userbasic = new UserBasic();
+			userbasic.setBasicSeq(rs.getInt("basic_seq"));
+			userbasic.setUserId(rs.getString("user_id"));
+			userbasic.setGender(rs.getInt("gender"));
+			userbasic.setHeight(rs.getInt("height"));
+			userbasic.setWeight(rs.getInt("weight"));
+			userbasic.setWaist(rs.getInt("waist"));
+			userbasic.setSmoke(rs.getInt("smoke"));
+			userbasic.setBlood(rs.getString("blood"));
+			userbasic.setCol(rs.getString("col"));
+			userbasic.setPress(rs.getString("press"));
+			userbasic.setRegDate(rs.getString("reg_date"));
+			return userbasic;
+		}
+	};
+	
+
+	private RowMapper userbasicMapperV = new RowMapper() {
+		public UserBasic mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserBasic userbasic = new UserBasic();
+			userbasic.setBasicSeq(rs.getInt("basic_seq"));
+			userbasic.setUserId(rs.getString("user_id"));
+			userbasic.setGender(rs.getInt("gender"));
+			userbasic.setHeight(rs.getInt("height"));
+			userbasic.setWeight(rs.getInt("weight"));
+			userbasic.setWaist(rs.getInt("waist"));
+			userbasic.setSmoke(rs.getInt("smoke"));
+			userbasic.setBlood(rs.getString("blood"));
+			userbasic.setCol(rs.getString("col"));
+			userbasic.setPress(rs.getString("press"));
+			userbasic.setRegDate(rs.getString("reg_date"));
+			userbasic.setBloodNum(rs.getInt("blood_num"));
+			userbasic.setPulse(rs.getInt("pulse"));
+			userbasic.setSplessure(rs.getInt("splessure"));
+			userbasic.setDplessure(rs.getInt("dplessure"));
+			userbasic.setWeightNum(rs.getInt("weight_num"));
+			userbasic.setBmi(rs.getInt("bmi"));
+			return userbasic;
+		}
+	};
+	
+	//유저기본정보 가져오기
+	public UserBasic getUserBasic(String id) {
+		String query = "" + 
+				"SELECT top 1 * " +
+				"FROM V_NF_USER_BASIC " +
+				"WHERE user_id = ? order by basic_seq DESC";
+		try {
+			return (UserBasic)this.jdbcTemplate.queryForObject(query, new Object[] {id}, this.userbasicMapperV);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return new UserBasic();
+		}
+	}
+	
+	// 관리자 유저정보 가지고 오기
+	public UserBasic getUserBasicView(String id) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_USER_BASIC " +
+				"WHERE user_id = ?";
+		try {
+			return (UserBasic)this.jdbcTemplate.queryForObject(query, new Object[] {id}, this.userbasicMapper);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+		
+	}
+	
+	
+	
+	//문진수정,등록
+	public void addUserBasic(final UserBasic userbasic) {
+		String query = "" +
+				"INSERT INTO T_NF_USER_BASIC " +
+				"	(user_id, gender, height, weight, waist, smoke, blood, col, press, reg_date) " +
+				"VALUES " +
+				"	( ?, ?, ?, ?, ?, ?, ?, ?, ?, getDate()) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			
+			userbasic.getUserId(),
+			userbasic.getGender(),
+			userbasic.getHeight(),
+			userbasic.getWeight(),
+			userbasic.getWaist(),
+			userbasic.getSmoke(),
+			userbasic.getBlood(),
+			userbasic.getCol(),
+			userbasic.getPress(),
+	
+		});
+	}
+	
+	//해당아이디 삭제
+	
+	public void deleteUserBasic(String id) {
+		String query = "DELETE FROM T_NF_USER_BASIC WHERE user_id = ? ";
+		this.jdbcTemplate.update(query, new Object[] { id });
+	}
+	
+}

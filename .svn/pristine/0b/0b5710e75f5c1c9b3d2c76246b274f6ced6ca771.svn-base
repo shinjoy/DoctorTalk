@@ -1,0 +1,50 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Comment;
+
+
+
+
+
+public class CommentDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper commentMapper = new RowMapper() {
+		public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Comment comment = new Comment();
+			comment.setCommentSeq(rs.getInt("comment_seq"));
+			comment.setCommentCode(rs.getInt("comment_code"));
+			comment.setCommnet(rs.getString("commnet"));
+			return comment;
+		}
+	};
+	
+	public Comment getComment(int commentCode) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_COMMENT " +
+				"WHERE comment_code = ? ";
+		try{
+			return (Comment)this.jdbcTemplate.queryForObject(query, new Object[] { commentCode }, this.commentMapper);
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
+	
+
+}

@@ -1,0 +1,222 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Cperiod;
+import kr.nomad.mars.dto.Cvrisk;
+import kr.nomad.mars.dto.MedExam;
+import kr.nomad.mars.dto.Period;
+
+
+public class CvriskDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper cvriskMapper = new RowMapper() {
+		public Cvrisk mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Cvrisk cvrisk = new Cvrisk();
+			cvrisk.setCvSeq(rs.getInt("cv_seq"));
+			cvrisk.setSort(rs.getInt("sort"));
+			cvrisk.setPseq(rs.getInt("pseq"));
+			cvrisk.setAskind(rs.getInt("askind"));
+			cvrisk.setComment(rs.getString("comment"));
+			cvrisk.setMove(rs.getInt("move"));
+			cvrisk.setValue(rs.getString("value"));
+			cvrisk.setQtype(rs.getString("qtype"));
+			cvrisk.setAnsType(rs.getInt("ans_type"));
+			cvrisk.setKind(rs.getInt("kind"));
+			cvrisk.setIsLast(rs.getInt("is_last"));
+			return cvrisk;
+		}
+	};
+	
+	public List<Cvrisk> getCvrisk(int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_CVRISK " +
+				"WHERE askind = 1 and kind= ?"+
+				"ORDER BY sort ASC";
+		return (List<Cvrisk>)this.jdbcTemplate.query(query, new Object[] { kind }, this.cvriskMapper);
+	}
+	
+	public List<Cvrisk> CvriskAnswerList(int seq,int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_CVRISK " +
+				"WHERE askind = 2 and pseq= ? and kind= ?" + 
+				"ORDER BY sort ASC ";
+		return (List<Cvrisk>)this.jdbcTemplate.query(query, new Object[] { seq,kind }, this.cvriskMapper);
+	}		
+		
+	
+	////////////////////
+	
+	
+	public void addCvrisk(final Cvrisk cvrisk) {
+		String query = "" +
+				"INSERT INTO T_NF_DOCTOR_CVRISK " +
+				"	(sort, pseq, askind, comment, move, value, qtype, ans_type, kind, is_last) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			cvrisk.getSort(),
+			cvrisk.getPseq(),
+			cvrisk.getAskind(),
+			cvrisk.getComment(),
+			cvrisk.getMove(),
+			cvrisk.getValue(),
+			cvrisk.getQtype(),
+			cvrisk.getAnsType(),
+			cvrisk.getKind(),
+			cvrisk.getIsLast()
+		});
+	}
+
+	public void deleteCvrisk(int cv_seq) {
+		String query = "DELETE FROM T_NF_DOCTOR_CVRISK WHERE cv_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { cv_seq });
+	}
+
+	public void updateCvrisk(Cvrisk cvrisk) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_CVRISK SET " +
+				"	sort = ?, " +
+				"	pseq = ?, " +
+				"	askind = ?, " +
+				"	comment = ?, " +
+				"	move = ?, " +
+				"	value = ?, " +
+				"	qtype = ?, " +
+				"	ans_type = ?, " +
+				"	kind = ?, " +
+				"	is_last = ? " +
+				"WHERE cv_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			cvrisk.getSort(),
+			cvrisk.getPseq(),
+			cvrisk.getAskind(),
+			cvrisk.getComment(),
+			cvrisk.getMove(),
+			cvrisk.getValue(),
+			cvrisk.getQtype(),
+			cvrisk.getAnsType(),
+			cvrisk.getKind(),
+			cvrisk.getIsLast(),
+			cvrisk.getCvSeq()
+		});
+	}
+
+	public Cvrisk getCvriskList(int cv_seq) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_CVRISK " +
+				"WHERE cv_seq = ? order by sort";
+		try {
+			return (Cvrisk)this.jdbcTemplate.queryForObject(query, new Object[] { cv_seq }, this.cvriskMapper);
+		} catch (Exception e) {
+			return new Cvrisk();
+		}
+	}
+
+	
+	// 테이블 내용 수정 처리 
+	public void updateCvrisk(String comment, int cv_seq) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_CVRISK SET " +
+				"	comment = ? " +
+				"WHERE cv_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {comment ,cv_seq});
+	}
+	
+	// 정렬값 변경
+	public void updateCvrisk(int sort ,int cv_seq) { 
+		
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_CVRISK SET " +
+				"	sort = ? " +
+				" WHERE cv_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {sort,cv_seq});
+	}
+	
+	// 체크값 변경
+	public void updateCvriskIsLast(int is_last ,int cv_seq) { 
+		
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_CVRISK SET " +
+				"	is_last = ? " +
+				" WHERE cv_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {is_last,cv_seq});
+	}
+	
+	
+
+	public List<Cvrisk> getCvriskList2(int diseaseId) {
+		
+		List<Cvrisk> result = null;
+
+		String condition = "WHERE 1=1";
+		
+		if (diseaseId == 0) {
+			condition += " AND kind = 0";
+		} else if (diseaseId == 1) {
+			condition += "  AND  kind = 1";
+		} else if (diseaseId == 2) {
+			condition += "  AND  kind = 2 ";
+		} else if (diseaseId == 3) {
+			condition += "  AND  kind = 3";
+		} 
+	
+		
+		String query = ""
+		//		+ "	SELECT * FROM ( "
+				+ "	SELECT "
+		//		+ "		ROW_NUMBER() OVER(ORDER BY sort asc ) AS row_seq, "
+				+ "		* "
+				+ "	FROM T_NF_DOCTOR_CVRISK "
+			    + "    " + condition  
+			    + " order by sort ";
+		//		+ ") AS row WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") + 1 AND "+page+" * "+itemCountPerPage+" ";
+				
+		result = (List<Cvrisk>)this.jdbcTemplate.query(query, this.cvriskMapper);
+		
+		return result;
+	}
+	
+	
+	public int getCount(int diseaseId) {
+	
+		int result = 0;		
+
+		String condition = "WHERE 1=1";
+		
+		if (diseaseId == 0) {
+			condition += " AND kind = 0";
+		} else if (diseaseId == 1) {
+			condition += "  AND  kind = 1";
+		} else if (diseaseId == 2) {
+			condition += "  AND  kind = 2 ";
+		} else if (diseaseId == 3) {
+			condition += "  AND  kind = 3";
+		} 
+		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_DOCTOR_CVRISK "
+				  + " " + condition ;
+		result = this.jdbcTemplate.queryForInt(query);
+				
+		return result;
+	}
+	
+	
+
+
+}

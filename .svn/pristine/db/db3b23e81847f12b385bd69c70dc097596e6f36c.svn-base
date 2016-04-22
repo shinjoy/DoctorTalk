@@ -1,0 +1,155 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header.jsp"  %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	//aside.setActive(1,1);
+});
+
+</script>
+
+</head>
+<body>
+
+<%@ include file="/WEB-INF/views/admin/admin_header.jsp"  %>
+
+<section class="main-cover main-row">
+	<section id="main">
+		
+		<%@ include file="/WEB-INF/views/admin/admin_menu.jsp"  %>
+
+		<section id="contents">
+			<header class="panel">
+				 ■ 홈
+			</header>
+		
+			<div class="contents-block">
+			
+				<table>
+				<tr>
+					<td>
+						<dl class="title-box">
+							<dt>
+								<div class="tbl">
+									<span>최근 등록 회원</span>
+									<span class="more"><button type="button" class="btn" onclick="document.location.href='/admin/user/user.go';">more</button></span>
+								</div>
+							</dt>
+							<dd style="background-color:#f7f7f7;">
+								<ul>
+									<c:choose>	
+										<c:when test="${user.size() > 0}">
+											<c:forEach var="it" items="${user}">
+												<a href="/admin/user/user_view.go?userId=${it.userId}">
+												<li class="imglist user">
+													<div class="photo-big" style="background-image:url('${it.photo == '' ? '/images/img_pro_defult.png' : it.photo}')"></div>
+													<div class="user-info">
+															<b>${it.userName}(${it.userAge})</b>
+															<br>
+															${it.genderText} | ${it.area}
+															<br>
+															${it.regDate.substring(0,16)}
+													</div>
+												</li>
+												<a>
+											</c:forEach>
+										</c:when>
+										<c:otherwise>
+											<li style="height:100px; text-align:center; border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding-top:80px; "> 조회된 데이터가 없습니다.</li>
+										</c:otherwise>												
+									</c:choose>
+									
+								</ul>
+								<div style="clear:both;"></div>
+
+							</dd>
+						</dl>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<dl class="title-box">
+							<dt>
+								<div class="tbl">
+									<span>최근토크</span>
+									<span class="more"><button type="button" class="btn" onclick="document.location.href='/admin/talk/talk.go';">more</button></span>
+								</div>
+							</dt>
+							<dd style="background-color:#f7f7f7;">
+								<ul>
+									<c:choose>	
+										<c:when test="${bbs.size() > 0}">
+											<c:forEach var="it" items="${bbs}">
+												<li class="imglist bbs">
+
+													<a href="/admin/talk/talk_view.go?bbsSeq=${it.bbsSeq}">
+														<div class="round-box" style="width:220px; padding:10px;">
+															<table>
+															<colgroup>
+																<col width="60">
+																<col width="*">
+															</colgroup>
+															<tr>
+																<td>
+																	<div class="photo-detail" style="background-image:url('${it.photo == '' ? '/images/img_pro_defult.png' : it.photo}')"></div>
+																</td>
+																<td>
+																	<b>${it.userName} ( ${it.userAge} )</b>
+																	<br>
+																	${it.genderText} | ${it.area}
+																	<br>
+																	<span class="good"><img src='/images/btn_good_dw.png' style="height:12px;"> ${it.likeCount}</span>
+																	<span class="good"><img src='/images/btn_reply_dw.png' style="height:12px;"> ${it.commentCount}</span>
+																	<span class="good">신고 ${it.reportCount}</span>
+																</td>
+															</tr>
+															</table>
+															
+															<hr>
+															
+															<div class="bbs-contents-preview">
+																<c:choose>
+																	<c:when test="${it.bbsContents.length() > 200}">
+																		${it.bbsContents.substring(0,198)} ...
+																	</c:when>
+																	<c:otherwise>
+																		${it.bbsContents}
+																	</c:otherwise>
+																</c:choose>
+																
+															</div>
+					
+															<div class="img-thumb">
+																<c:if test="${it.files!=''}"><img src="${it.files}"></c:if>
+															</div>
+															
+															<hr>
+															${fn:substring(it.regDate,0,16)}
+					
+														</div>
+													</a>	
+												</li>
+											</c:forEach>
+										</c:when>
+										<c:otherwise>
+											<li style="height:100px; text-align:center; border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding-top:80px; "> 조회된 데이터가 없습니다.</li>
+										</c:otherwise>												
+									</c:choose>
+								</ul>
+								<div style="clear:both;"></div>
+							</dd>
+						</dl>
+					</td>
+				</tr>
+				</table>
+			</div>
+		</section>
+	</section>
+</section>
+
+<%@ include file="/WEB-INF/views/admin/admin_footer.jsp"  %>
+
+</body>
+</html>

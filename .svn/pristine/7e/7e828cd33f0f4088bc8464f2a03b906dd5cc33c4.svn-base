@@ -1,0 +1,83 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header5.jsp"  %>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../jqplot/jquery.jqplot.js"></script>
+<script type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+<script type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+<script type="text/javascript" src="../plugins/jqplot.pointLabels.js"></script>
+<link rel="stylesheet" type="text/css" href="/jqplot/jquery.jqplot.css" />
+<html>
+<head>
+
+<title>Insert title here</title>
+</head>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	var colArr = new Array();
+	var ldlArr = new Array();
+	var hdlArr = new Array();
+	var tgArr = new Array();
+	var periodArr = new Array();
+	 <c:forEach items="${list}" var="item1">
+		 colArr.push("${item1.col}");
+		 ldlArr.push("${item1.ldl}");
+		 hdlArr.push("${item1.hdl}");
+		 tgArr.push("${item1.tg}");
+	 	periodArr.push("${item1.date}");
+	 </c:forEach>
+	 
+	
+	 
+	   var plot1 = $.jqplot('chart1', [colArr,ldlArr,hdlArr,tgArr], {
+	      title: '콜레스테롤목표:${goalcol}   LDL목표:${goalldl}   HDL목표:${goalhdl} 중성지방목표:${goaltg}', 
+	      axes:{ // 축 옵션
+	    	  	xaxis: {
+	               renderer: $.jqplot.CategoryAxisRenderer,
+	               ticks: periodArr
+           
+	    	    }, 
+	    	    yaxis:{ // y축 옵션
+	    	             
+	    	             min : 0, // 최소값
+	    	             max : 300,  // 최대값
+	    	             numberTicks : 6, // 인위적으로 축을 나누는 개수
+	    	             tickOptions:{
+	    	             	fontString : '%1f' // 소수점 1째 자리까지 표기
+	    	             }
+	    	     }
+	      },
+	      seriesDefaults: { 
+	        showMarker:true,
+	        pointLabels: { show:true },
+			//fill: true 
+	      }
+	   
+	   
+	  }); 
+	});
+</script>
+<body>
+	<form name="pageForm">
+		
+		<input type="hidden" name="listEmpty" value="${listEmpty}">
+		<input type="hidden" name="listAfterEat" value="${listAfterEat}">
+		<input type="hidden" name="listBeforeSleep" value="${listBeforeSleep}">
+	 	<%-- <table>
+			<c:forEach items="${listEmpty}" var="it">
+				<tr>
+					<td>${it.bloodNum}</td>
+				</tr>
+			
+			</c:forEach>
+		</table>  --%>
+		
+	</form>
+   <div id="chart1"/>
+</body>
+</body>
+</html>

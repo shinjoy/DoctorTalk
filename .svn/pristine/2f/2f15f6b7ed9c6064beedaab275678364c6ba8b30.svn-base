@@ -1,0 +1,32 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header.jsp"  %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+
+</head>
+<body>
+
+<c:forEach items="${list }" var="it">
+	<table border=1>
+		<tr>
+			<td rowspan="3"><div class="photo-detail" style="background-image:url('${it.thumFile}');"></div></td>
+			<td>${it.title }</td>
+		</tr>
+		<tr>
+			<td>${it.subTitle }</td>
+			
+		</tr>
+		<tr>
+			<td>${it.month }</td><td><button type="button"  class="btn-blue" onclick="document.location.href='/maga_view.go?mSeq=${it.mSeq}'">보기</button></td>
+		</tr>
+		
+	</table>
+</c:forEach>
+
+
+
+</body>
+</html>

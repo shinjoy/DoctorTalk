@@ -1,0 +1,92 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.UserBlood;
+import kr.nomad.util.T;
+
+public class UbloodDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper userbloodMapper = new RowMapper() {
+		public UserBlood mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserBlood userblood = new UserBlood();
+			userblood.setBloSeq(rs.getInt("blo_seq"));
+			userblood.setUserId(rs.getString("user_id"));
+			userblood.setBloodTime(rs.getInt("blood_time"));
+			userblood.setBloodKind(rs.getInt("blood_kind"));
+			userblood.setBloodNum(rs.getInt("blood_num"));
+			userblood.setRegDate(rs.getString("reg_date"));
+			return userblood;
+		}
+	};
+	
+	public int getUserBloodList(String id,String month) {
+		String query = "SELECT COUNT(*) FROMT_NF_USER_BLOOD WHERE user_id = ? and month = ?";
+		return this.jdbcTemplate.queryForInt(query, new Object[] { id , month });
+	}
+
+	public void addUserBlood(final UserBlood userblood) {
+		String query = "" +
+				"INSERT INTO T_NF_USER_BLOOD " +
+				"	(blo_seq, user_id, blood_time, blood_kind, blood_num, reg_date) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			userblood.getBloSeq(),
+			userblood.getUserId(),
+			userblood.getBloodTime(),
+			userblood.getBloodKind(),
+			userblood.getBloodNum(),
+			userblood.getRegDate()
+		});
+	}
+
+	public void deleteUserBlood(String blo_seq) {
+		String query = "DELETE FROM T_NF_USER_BLOOD WHERE blo_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { blo_seq });
+	}
+
+	public void updateUserBlood(UserBlood userblood) { 
+		String query = "" + 
+				"UPDATE T_NF_USER_BLOOD SET " +
+				"	blo_seq = ?, " +
+				"	user_id = ?, " +
+				"	blood_time = ?, " +
+				"	blood_kind = ?, " +
+				"	blood_num = ?, " +
+				"	reg_date = ? " +
+				"WHERE blo_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			userblood.getBloSeq(),
+			userblood.getUserId(),
+			userblood.getBloodTime(),
+			userblood.getBloodKind(),
+			userblood.getBloodNum(),
+			userblood.getRegDate()
+		});
+	}
+
+	public UserBlood getUserBlood(String blo_seq) {
+		String query = "" + 
+				"SELECT blo_seq, user_id, blood_time, blood_kind, blood_num, reg_date " +
+				"FROM T_NF_USER_BLOOD " +
+				"WHERE blo_seq = ? ";
+		return (UserBlood)this.jdbcTemplate.queryForObject(query, new Object[] { blo_seq }, this.userbloodMapper);
+	}
+
+	
+
+}

@@ -1,0 +1,184 @@
+@CHARSET "UTF-8";
+
+/* 메인달력_달력 */
+
+
+.u_hc {
+	visibility:hidden;
+	overflow:hidden;
+	position:absolute; -999em;
+	width:0;
+	height:0;
+	font-size:0;
+	line-height:0;
+}
+
+.calendar_controll {
+	border-bottom:1px solid #c3c7ca;
+	display:block;
+	overflow:hidden;
+	clear:both;
+	padding-top:10px;
+}
+
+.calendar_controll ul {
+	text-align:center;
+	display:block;
+	overflow:hidden;
+	padding:5px 0px;
+}
+
+
+.calendar_controll li {
+	display: inline-block;
+}
+
+.calendar_controll .num_date {
+	font-size:20px;
+	font-weight:bold;
+	color:#444;	
+	margin:0 30px;
+	height:26px;
+	vertical-align:top;
+	padding-top:5px;
+}
+
+
+.calendar_controll .date_prev {
+	background:url('/images/btn_carwb.png') 0 0 no-repeat;
+	width:26px;
+	height:26px;
+	border:none;
+	background-size:cover;
+	cursor:pointer;
+}
+
+.calendar_controll .date_next {
+	background:url('/images/btn_carw.png') 0 0 no-repeat;
+	width:26px;
+	height:26px;
+	border:none;
+	background-size:cover;
+	cursor:pointer;
+}
+
+
+.calendar {
+	width:100%;
+	height:70%;
+	margin:0 auto;
+	border-spacing:2px;
+	border-collapse:collapse;
+	text-align:center;
+}
+
+
+.calendar thead {
+	display:table-header-group;
+	vertical-align:middle;
+	border-color:inherit;
+	background:#fafafa;
+}
+
+.calendar tbody {
+	display:table-row-group;
+	vertical-align:middle;
+	border-color:inherit;
+}
+
+.calendar tr {
+	display:table-row;
+	vertical-align:inherit;
+	border-color:inherit;
+}
+
+.calendar thead {
+	border-bottom:1px solid #e2e3e5;
+
+}
+
+.calendar thead th {
+	height:33px;
+	color:#acb3b9;
+	border:1px solid #c7c1a5;
+	font-weight:bold;
+}
+
+.calendar tbody tr td {
+	vertical-align:top;
+	padding-top:0px;
+	border:1px solid #c7c1a5;
+	height:100px;
+}
+
+.calendar .record {	
+	z-index:1000;
+	background-color:#ffdb34;
+	width:6px;
+	height:6px;
+	border-radius:100px;
+}
+
+.calendar .date {
+	width:30px;
+	height:20px;
+	display:block;
+	position:relative;
+	top:0;
+	left:0;
+	line-height:20px;
+}
+
+
+.calender tbody td a {	
+	position:relative;
+	margin:0 auto;
+	font-weight:bold;
+	color:#444;
+	width:100%;
+	height:100%
+
+}
+
+.calendar tbody td a:hover {	
+	color:#000;
+} 
+
+.calendar .date_this_month {
+	background:#eee;
+}
+
+.calendar .date_prev_month, .calendar .date_next_month {
+	color:#b1b1b1;
+	background:#fff;
+}
+
+.calendar .date_today {	
+	background:#ffa;
+}
+
+.calendar .date_selected {	
+	font-weight:bold;
+	font-size:16px;
+	color:#f41;
+}
+
+.calendar .sun {
+	color:#900023;
+}
+
+.calendar .sat {
+	color:#228bce;
+}
+
+.calendar .red {
+	
+}
+
+.schedule li {
+	margin:2px 5px;
+	padding-top:-5px;
+	list-style-image:url('/images/bullet-blue.png');
+	list-style-position:inside;
+	text-align:left;
+}

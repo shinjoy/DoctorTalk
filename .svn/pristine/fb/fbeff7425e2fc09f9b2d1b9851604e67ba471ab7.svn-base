@@ -1,0 +1,76 @@
+package kr.nomad.mars.dto;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Day {
+	
+	int daySeq = 0;
+	int sort = 0;
+	int pseq = 0;
+	int askind = 0;
+	String comment = "";
+	int move = 0;
+	int ansType = 0;
+	String daygroup="";
+	List answerList = new ArrayList();
+	
+	
+	public String getDaygroup() {
+		return daygroup;
+	}
+	public void setDaygroup(String daygroup) {
+		this.daygroup = daygroup;
+	}
+	public List getAnswerList() {
+		return answerList;
+	}
+	public void setAnswerList(List answerList) {
+		this.answerList = answerList;
+	}
+	public int getDaySeq() {
+		return daySeq;
+	}
+	public void setDaySeq(int daySeq) {
+		this.daySeq = daySeq;
+	}
+	public int getSort() {
+		return sort;
+	}
+	public void setSort(int sort) {
+		this.sort = sort;
+	}
+	public int getPseq() {
+		return pseq;
+	}
+	public void setPseq(int pseq) {
+		this.pseq = pseq;
+	}
+	public int getAskind() {
+		return askind;
+	}
+	public void setAskind(int askind) {
+		this.askind = askind;
+	}
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	public int getMove() {
+		return move;
+	}
+	public void setMove(int move) {
+		this.move = move;
+	}
+	public int getAnsType() {
+		return ansType;
+	}
+	public void setAnsType(int ansType) {
+		this.ansType = ansType;
+	}
+
+	
+
+}

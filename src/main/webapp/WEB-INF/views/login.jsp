@@ -1,0 +1,238 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header.jsp"  %>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		frm = loginForm;
+	});
+	
+	function loginFormCheck(frm) {
+		var loginId = frm.loginId.value;
+		var loginPw = frm.loginPw.value;
+
+		if (loginId == "") {
+			alert("사용자 ID를 입력해주세요.");
+			return false;
+		}
+		if (loginPw == "") {
+			alert("비밀번호를 입력해주세요.");
+			return false;
+		}
+
+		var param = {
+			loginId : loginId,
+			loginPw : loginPw
+		};
+		
+		$.ajax({
+		    type:"POST",
+		    url:"/login_do.go",
+		    dataType:"json",
+		    data:param,
+		    success:function(json) {
+		        if (json.result) {
+	        		document.location.href = "/admin/user/user.go";	
+		        } else {
+		        	alert(json.message);
+		        }
+		    },
+		    error:function(xhr, status, error) {
+		        alert(error);
+		    },
+		    complete:function(data) {
+		    }
+		});
+		return false;
+	}
+
+	
+</script>
+
+<style>
+
+<!--
+	.login-article { height:500px; }
+	/* 로그인 폼박스 */
+	#logbox { padding:18px; }
+	
+	/* 로그인 폼 */
+	.logbox {
+		background-color:#fff;
+		border:1px solid #ededed;
+		width:330px;
+		height:180px;
+		margin:auto;
+		padding:35px 30px;
+		background: #f7f7f7; -moz-liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%); -webkit-gradient(liner, left top, left bottom, color-stop(0%,#f7f7f7), solor-stop(100%,#e9e9e9));
+		-webkit-liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%); -o-liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%); -ms-liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%); liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#e9e9e9',GradientType=0 ); /* IE6-9 */	-webkit-border-radius: 3px;	-moz-border-radius: 3px;	border-radius: 3px;
+		border:1px solid #ddd;
+	}
+	h1 {font-size:12px; color:#666; text-align:left; margin:5px 0px 25px 0px; }
+	.login-logo { width:170px; margin:20px auto;}
+	.log_form {text-align:left; margin-top:20px;}
+	.log_form li {margin-top:5px; text-align:center;}
+	.log_form li input {width:320px;}
+	INPUT[type=text].bb, INPUT[type=password].bb, INPUT[type=date].bb, INPUT[type=time].bb {
+		border: 1px solid #b5b6b3;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		-khtml-border-radius: 5px;
+		border-radius: 5px;
+		-moz-box-shadow: inset 0 0 10px #e9e9e9;
+		-webkit-box-shadow: inset 0 0 10px #e9e9e9;
+		box-shadow: inset 0 0 10px #e9e9e9;
+		box-sizing: content-box;
+		-ms-box-sizing: content-box;
+		-moz-box-sizing: content-box;
+		-webkit-box-sizing: content-box;
+		margin-right: 4px;
+		margin-top: -1px;
+		padding: 6px 6px;
+		color: #8a8a8a;
+		font-size: 12px;
+		height: 15px;
+		width: 260px;
+	}
+	INPUT[type="submit"].bb:hover, INPUT[type="submit"].bb:focus, INPUT[type="submit"].bb:active, INPUT[type="button"].bb:hover, INPUT[type="button"].bb:focus, INPUT[type="button"].bb:active, BUTTON.bb:hover, BUTTON.bb:focus, BUTTON.bb:active, A.button:hover, A.button:focus, A.button:active {
+		-moz-opacity: 0.6;
+		-khtml-opacity: 0.6;
+		opacity: 0.6;
+		filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+		text-decoration: none;
+	}
+	INPUT[type="submit"].blue, INPUT[type="button"].blue, BUTTON.blue, A.blue {
+		background-color: #80c2f4;
+		color: #fff;
+	}
+	INPUT[type="submit"].big, INPUT[type="button"].big, BUTTON.big, A.big {
+		font-weight: bold;
+		font-size: 13px;
+		padding: 5px 15px;
+		margin: 2px;
+		height: 30px;
+	}
+	INPUT[type="submit"].round, INPUT[type="button"].round, BUTTON.round, A.round {
+		-moz-border-radius: 3px;
+		-webkit-border-radius: 3px;
+		-khtml-border-radius: 3px;
+		border-radius: 3px;
+	}
+	INPUT[type="submit"].bb, INPUT[type="button"].bb, BUTTON.bb {
+		display: inline-block;
+		border: 0px;
+		letter-spacing: -0.5px;
+		font-family: '돋움';
+		font-size: 12px;
+		text-transform: uppercase;
+		cursor: pointer;
+		padding: 6px 7px;
+		height: 27px;
+	}
+-->
+
+
+.login-input { padding:4px; border-top:1px solid #ddd; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd;}
+.btn.gray { 
+	border: 1px solid #B5B6B3;
+	background: #FAFAFA;
+	color: #000;
+	padding:3px;
+}
+#login .contents .inner { padding: 16px 35px 100px 0px;} 
+.martok { width:1000px;  padding: 10px 30px 10px 430px;} 
+.log-wrap { width:1000px; margin-top:-70px; margin-left: 300px;}
+.log-wrap table { width: 350px;}
+ .log-wrap th { font-size:14px; line-height:18px; padding:10px 0; text-align:left; vertical-align:top; } 
+.log-wrap td { padding: 5px 0;} 
+.login-title { margin-top:70px; margin-left:30px; font-weight:bold; font-size:20px;}
+.gray-top { width:1000px; padding-bottom:20px; border-bottom:1px solid #ddd;}
+.blue { border-top:2px solid #0683BB; width:950px; margin-left:30px; margin-top:20px;}
+.gray-bottom { border-bottom:1px solid #ddd; width:950px; margin-left:30px; }
+.login-text { width:260px; height:26px; border:1px solid #ddd; background-color:#fff; padding:0 10px; }
+</style>
+
+</head>
+<body id="login" style="background-image:none;" onload="loginCheck();">
+		<div class="login-wrap">
+		
+		<%@ include file="/WEB-INF/views/home_header.jsp"%> 
+		
+		<div class="login-title">로그인</div>
+		
+		<div class="gray-top"></div>
+		
+		<div class="login-content">
+
+			<div class="inner">
+		
+
+				<form name="loginForm" method="post" class="log_form" onsubmit="return loginFormCheck(this);return false">
+					<input type="hidden" name="userId" value="${USER_ID}">
+					<section id="contentsWrap-login">
+						<div class="contents">
+							<div class="inner">
+								
+								<div class="blue"></div>
+									<p class="martok" style="margin:50px 0;">
+										<img src="/images/aray1.png" style="height:50px;">
+									</p>
+								<div class="log-wrap">
+									<table>
+										<colgroup>
+											<col width="30%">
+											<col width="*">
+										</colgroup>
+					
+										<tr>
+											<th>&nbsp;</th>
+											<td>
+												<c:choose>
+													<c:when test="${ msg == '' || msg == null }">
+<!-- 														<h4 class="ad_title3">사용자 ID와 비밀번호를 입력해주세요.</h4> -->
+													</c:when>
+													<c:otherwise>
+														<h4 class="ad_title3">
+															<span style="color: #3dd4e1;">${message}</span>
+														</h4>
+													</c:otherwise>
+												</c:choose>
+											</td>
+										</tr>
+										<tr>
+											<th><div class="login-input">ID</div></th>
+											<td>
+												<input type="text" name="loginId" class="login-text" placeholder="아이디를 입력하세요">
+											</td>
+										</tr>
+
+										<tr>
+											<th><div class="login-input">비밀번호</div></th>
+											<td><input type="password" name="loginPw" class="login-text" placeholder="비밀번호를 입력하세요."></td>
+										</tr>
+										<tr>
+											<td colspan="2">												
+						
+												<input type="submit" name="go" class="btn gray" style="width:349px;" value="로그인">
+									
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</section>
+				</form>
+
+			</div>
+			
+		</div>
+			
+		<div class="gray-bottom"></div>	
+			
+			
+	</div>
+
+</body>
+</html>

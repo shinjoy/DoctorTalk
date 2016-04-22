@@ -1,0 +1,86 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header5.jsp"  %>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../jqplot/jquery.jqplot.js"></script>
+<script type="text/javascript" src="../plugins/jqplot.barRenderer.js"></script>
+<script type="text/javascript" src="../plugins/jqplot.categoryAxisRenderer.js"></script>
+<script type="text/javascript" src="../plugins/jqplot.pointLabels.js"></script>
+<link rel="stylesheet" type="text/css" href="/jqplot/jquery.jqplot.css" />
+<html>
+<head>
+
+<title>Insert title here</title>
+</head>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	var emptyArr = new Array();
+	var AfterEatArr = new Array();
+	var SleepArr = new Array();
+	var periodArr = new Array();
+	
+	<c:forEach items="${listEmpty}" var="item1">
+		emptyArr.push("${item1.bloodNum}");
+ 	 	periodArr.push("${item1.date}");
+ 	</c:forEach>
+	 <c:forEach items="${listAfterEat}" var="item1">
+	 	AfterEatArr.push("${item1.bloodNum}");
+	 </c:forEach>
+	 <c:forEach items="${listBeforeSleep}" var="item1">
+	 	SleepArr.push("${item1.bloodNum}");
+	 </c:forEach>
+ 	
+	
+	 
+	   var plot1 = $.jqplot('chart1', [emptyArr,AfterEatArr,SleepArr], {
+	      title: '공복혈당목표:${goalEmpty}   식후혈당목표:${goalEat}   취침전혈당목표:${goalSleep} ', 
+	      axes:{ // 축 옵션
+	    	  	xaxis: {
+	               renderer: $.jqplot.CategoryAxisRenderer,
+	               ticks: periodArr
+           
+	    	    }, 
+	    	    yaxis:{ // y축 옵션
+	    	             
+	    	             min : 0, // 최소값
+	    	             max : 200,  // 최대값
+	    	             numberTicks : 5, // 인위적으로 축을 나누는 개수
+	    	             tickOptions:{
+	    	             	fontString : '%1f' // 소수점 1째 자리까지 표기
+	    	             }
+	    	     }
+	      },
+	      seriesDefaults: { 
+	        showMarker:true,
+	        pointLabels: { show:true },
+			//fill: true 
+	      }
+	   
+	   
+	  }); 
+	});
+</script>
+<body>
+	<form name="pageForm">
+		
+		<input type="hidden" name="listEmpty" value="${listEmpty}">
+		<input type="hidden" name="listAfterEat" value="${listAfterEat}">
+		<input type="hidden" name="listBeforeSleep" value="${listBeforeSleep}">
+	 	<%-- <table>
+			<c:forEach items="${listEmpty}" var="it" varStatus="">
+				<tr>
+					<td>${it.bloodNum}</td>
+				</tr>
+			
+			</c:forEach>
+		</table> --%>  
+		
+	</form>
+   <div id="chart1"/>
+</body>
+</body>
+</html>

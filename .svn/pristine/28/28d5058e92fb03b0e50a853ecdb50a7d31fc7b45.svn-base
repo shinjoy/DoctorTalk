@@ -1,0 +1,372 @@
+package kr.nomad.mars;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import kr.nomad.mars.dao.AlertDao;
+import kr.nomad.mars.dao.NoticeDao;
+import kr.nomad.mars.dao.PushDao;
+import kr.nomad.mars.dao.UserDao;
+import kr.nomad.mars.dto.User;
+import kr.nomad.util.MtB;
+import kr.nomad.util.MyAuthenticator;
+import kr.nomad.util.Response;
+import net.sf.json.JSONObject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import encrypt.Sha256Util;
+
+@Controller
+public class ServerController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+
+	@Autowired
+	private NoticeDao noticeDao; 
+
+	@Autowired
+	private UserDao userDao;
+	
+	@Autowired
+	private AlertDao alertDao;
+	
+	@Autowired
+	private PushDao pushDao; 
+	// 페이지당 아이템 갯수
+	@Value("#{config['page.itemCountPerPage']}")
+	int ITEM_COUNT_PER_PAGE;
+
+	// 페이징당 페이지 갯수
+	@Value("#{config['page.pageCountPerPaging']}")
+	int PAGE_COUNT_PER_PAGING;
+
+	// 파일 루트
+	@Value("#{config['file.root']}")
+	String FILE_ROOT;
+
+	String FILE_PATH = "";
+	String FILE_LOCAL_PATH = "";
+
+	// 파일 최대크기(Mb)
+	@Value("#{config['file.maxSize']}")
+	int FILE_MAX_SIZE;
+
+	@RequestMapping("/api_view.go")
+	public String wUserMenuController(
+	        Model model
+	    ) {
+	 
+	    return "/api_view";
+	}
+	
+	/**
+	 * 로그인
+	 * @param loginId
+	 * @param loginPw
+	 * @param pushKey
+	 * @param req
+	 * @param res
+	 * @return
+	 */
+	@RequestMapping("/m/login.go")
+	public String loginController(
+			@RequestParam(value="loginId", required=false, defaultValue="") String loginId, 
+			@RequestParam(value="loginPw", required=false, defaultValue="") String loginPw, 
+			@RequestParam(value="pushKey", required=false, defaultValue="") String pushKey, 
+			HttpServletRequest req, HttpServletResponse res
+		) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		boolean result = true;
+		String message = "";
+
+		String enPw = "";
+		try {
+			boolean userCheck = userDao.correctId(loginId);
+			if (userCheck == true) {
+
+				enPw = Sha256Util.encryptPassword(loginPw);
+				boolean loginCheck = userDao.correctPw(loginId, enPw);
+
+				if (loginCheck == true) {
+
+					User user = userDao.getUser(loginId);
+					HttpSession session = req.getSession();
+					session.setAttribute("USER_ID", user.getUserId());
+					session.setAttribute("USER_NAME", user.getUserName());
+					
+					userDao.updateUserPushKey(loginId, pushKey);
+					
+					userDao.initUserPushKey(pushKey);
+					userDao.updateUserPushKey(loginId, pushKey);
+
+					map.put("message", "로그인이 성공되었습니다.");
+					map.put("result", true);
+					map.put("userName", user.getUserName());
+					map.put("userType", user.getUserType());
+
+				} else {
+					map.put("message", "패스워드가 일치하지 않습니다.");
+					map.put("result", false);
+					map.put("userType", 0);
+				}
+
+			} else {
+				map.put("message", "해당 ID가 존재하지 않거나 ID가 일치하지 않습니다.");
+				map.put("result", false);
+				map.put("userType", 0);
+			}
+		} catch (Exception e) {
+			map.put("message", e.getMessage());
+			map.put("result", false);
+			map.put("userType", 0);
+		}
+
+		JSONObject jsonObject = JSONObject.fromObject(map);
+		Response.responseWrite(res, jsonObject);
+		return null;
+	}
+
+	/**
+	 * 아이디 찾기
+	 * @param userName
+	 * @param phoneNumber
+	 * @param req
+	 * @param res
+	 * @return
+	 */
+	@RequestMapping("/m/find_id.go")
+	public String findIdController(
+			@RequestParam(value="userName", required=false, defaultValue="") String userName, 
+			@RequestParam(value="phoneNumber", required=false, defaultValue="") String phoneNumber, 
+			HttpServletRequest req, HttpServletResponse res
+		) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		User user = userDao.getUserByNamePhone(userName, phoneNumber);
+		
+		if (user == null) {
+			map.put("result", false);
+			map.put("message", "존재하지 않는 계정 입니다.");
+		} else {
+			map.put("result", true);
+			map.put("userId", user.getUserId());
+		}
+		
+		JSONObject jsonObject = JSONObject.fromObject(map);
+		Response.responseWrite(res, jsonObject);
+		return null;
+	}
+
+	/**
+	 * 비밀번호 변경 : 아이디 전화번호 인증
+	 * @param userId
+	 * @param phoneNumber
+	 * @param newPw
+	 * @param req
+	 * @param res
+	 * @return
+	 */
+	@RequestMapping("/m/pw_change.go")
+	public String pwChangeController(
+			@RequestParam(value="userId", required=false, defaultValue="") String userId, 
+			@RequestParam(value="phoneNumber", required=false, defaultValue="") String phoneNumber, 
+			@RequestParam(value="newPw", required=false, defaultValue="") String newPw, 
+			HttpServletRequest req, HttpServletResponse res
+		) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		User user = userDao.getUserByIdPhone(userId, phoneNumber);
+		
+		if (user == null) {
+			map.put("result", false);
+			map.put("message", "존재하지 않는 계정 입니다.");
+		} else {
+			String enPw;
+			try {
+				enPw = Sha256Util.encryptPassword(newPw);
+				userDao.updateUserPassword(userId, enPw);
+				
+				map.put("result", true);
+				map.put("message", "비밀번호가 수정되었습니다.");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		JSONObject jsonObject = JSONObject.fromObject(map);
+		Response.responseWrite(res, jsonObject);
+		return null;
+	}
+
+	/**
+	 * 아이디 중복체크
+	 * @param userId
+	 * @param req
+	 * @param res
+	 * @return
+	 */
+	@RequestMapping("/m/check_id.go")
+	public String checkIdController(
+			@RequestParam(value="userId", required=false, defaultValue="") String userId, 
+			HttpServletRequest req, HttpServletResponse res
+		) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		boolean check = userDao.correctId(userId);
+		
+		if (check) {
+			map.put("result", true);
+			map.put("message", "사용중인 ID 입니다.");
+		} else {
+			map.put("result", false);
+			map.put("message", "사용할 수 있는 ID 입니다.");
+		}
+		
+		JSONObject jsonObject = JSONObject.fromObject(map);
+		Response.responseWrite(res, jsonObject);
+		return null;
+	}
+	
+	@RequestMapping("/m/check_phone.go")
+	public String checkPhoneController(
+			@RequestParam(value="phoneNumber", required=false, defaultValue="") String phoneNumber, 
+			HttpServletRequest req, HttpServletResponse res
+		) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		boolean check = userDao.correctPhoneNumber(phoneNumber);
+		
+		if (check) {
+			map.put("result", true);
+			map.put("message", "사용중인 전화번호 입니다.");
+		} else {
+			map.put("result", false);
+			map.put("message", "사용할 수 있는 전화번호 입니다.");
+		}
+		
+		JSONObject jsonObject = JSONObject.fromObject(map);
+		Response.responseWrite(res, jsonObject);
+		return null;
+	}
+	
+	/**
+	 * 가입하기
+	 * @param userId
+	 * @param userPw
+	 * @param userName
+	 * @param userAge
+	 * @param userGender
+	 * @param res
+	 * @return
+	 */
+	@RequestMapping("/m/join.go")
+	public String joinController(
+			@RequestParam(value="userId", required=false, defaultValue="") String userId, 
+			@RequestParam(value="userPw", required=false, defaultValue="") String userPw, 
+			@RequestParam(value="userName", required=false, defaultValue="") String userName, 
+			@RequestParam(value="birthday", required=false, defaultValue="") String birthday, 
+			@RequestParam(value="gender", required=false, defaultValue="1") int gender, 
+			HttpServletRequest req, HttpServletResponse res
+		) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		try {
+			boolean userCheck = userDao.correctId(userId);
+			if (userCheck) {
+				map.put("result", false);
+				map.put("message", "존재하는 아이디 입니다.");
+			} else {
+				
+				String enPw = Sha256Util.encryptPassword(userPw);
+
+				User user = new User();
+				user.setUserId(userId);
+				user.setPassword(enPw);
+				user.setUserType("3");			// 관리자 여부(1: 최고관리자, 2:분석가, 3:일반회원)
+				user.setUserName(userName);
+				user.setBirthday(birthday);
+				user.setGender(gender);
+				userDao.addUser(user);
+
+				map.put("result", true);
+				map.put("message", "회원가입되었습니다.");
+			}
+		} catch (Exception e) {
+			map.put("result", false);
+			map.put("message", e.getMessage());
+		}
+		 
+		JSONObject jsonObject = JSONObject.fromObject(map);
+		Response.responseWrite(res, jsonObject);
+		return null;
+	}
+	
+
+	/**
+	 * 탈퇴하기
+	 * @param userId
+	 * @param res
+	 * @return
+	 */
+	@RequestMapping("/m/withdraw.go")
+	public String withdrawController(
+			@RequestParam(value="userId", required=false, defaultValue="") String userId, 
+			HttpServletRequest req, HttpServletResponse res
+		) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		try {
+			boolean userCheck = userDao.correctId(userId);
+			if (userCheck == false) {
+				map.put("result", false);
+				map.put("message", "존재하지 않는 아이디 입니다.");
+			} else {
+				//작성한 리뷰 삭제
+				//등록한 단골 삭제
+				//회원테이블 삭제
+				userDao.deleteUser(userId);
+						
+				map.put("result", true);
+				map.put("message", "탈퇴되었습니다.");
+			}
+		} catch (Exception e) {
+			map.put("result", false);
+			map.put("message", e.getMessage());
+		}
+		 
+		JSONObject jsonObject = JSONObject.fromObject(map);
+		Response.responseWrite(res, jsonObject);
+		return null;
+	}
+	
+
+	
+}

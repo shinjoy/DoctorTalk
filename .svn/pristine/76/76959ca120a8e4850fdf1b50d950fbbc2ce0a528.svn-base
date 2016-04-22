@@ -1,0 +1,227 @@
+package kr.nomad.mars;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import kr.nomad.mars.dao.PushDao;
+import kr.nomad.mars.dao.UCntDao;
+import kr.nomad.mars.dao.UserDao;
+import kr.nomad.mars.dto.Push;
+import kr.nomad.mars.dto.User;
+import kr.nomad.mars.dto.UserCnt;
+import kr.nomad.util.T;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SchedulerController {
+
+	@Autowired UserDao userdao;
+	@Autowired PushDao pushDao;
+	@Autowired UCntDao ucntDao;
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+
+	//@Scheduled(fixedDelay = 10000) // 5초마다 실행한다.
+	@Scheduled(cron = "1 * * * * ?") // 매분마다 실행한다. 초 분 시 일 월 주(년)
+	public void eatMedicineScheduler() {
+		
+		// 매 분마다(매분 1초) 복약 알림 푸시를 발송한다.
+
+		String time = T.getNowFomat2();
+		String week = T.getWeekday();
+		
+		logger.info("time "+ time);
+		logger.info("week "+ week);
+		
+		time = time.replace("오전", "AM").replace("오후", "PM");
+	
+		List list = userdao.getUserListEatMedicine(time,week);
+		String message = "복약하실 시간입니다.";
+		
+		for (int i=0; i<list.size(); i++) {
+			User user = (User) list.get(i);
+		
+			if (user.getPushkey().equals("") == false) {
+			
+				Push push = new Push();
+				push.setBadge(1);
+				push.setOs(user.getOsType());
+				push.setPushKey(user.getPushkey());
+				push.setMsgType(Push.MSG_TYPE_EAT_MED);
+				push.setUserid(user.getUserId());
+				push.setStatus(0);
+				push.setServiceId("RECOVER");
+				push.setPushType(1);							
+				push.setMsg(message);
+				push.setMsgKey("0");
+				pushDao.addPush(push);
+			}
+			
+		}
+	}
+
+
+	//@Scheduled(fixedDelay = 10000) // 5초마다 실행한다.
+	@Scheduled(cron = "* * 13 * * ?") // 매분마다 실행한다. 초 분 시 일 월 주(년)
+	public void noCheckedScheduler() {
+		
+	
+		// 오후 1시에 기간내 미입력 대상자에게 푸시 발송
+		String today = T.getToday(); // "2015-10-12"
+		String bloodBefore =T.getDateAdd(today, -2); //혈당
+		String pressBefore = T.getDateAdd(today, -6); //혈압
+		String weigthBefore = T.getDateAdd(today, -30); //체중
+		
+		List list = userdao.getUserListEperiod(today,bloodBefore,pressBefore,weigthBefore);
+		String message = "데이터를 입력해주세요.";
+		
+		for (int i=0; i<list.size(); i++) {
+			User user = (User) list.get(i);
+			
+			if (user.getPushkey().equals("") == false) {
+				UserCnt uc = ucntDao.getUserCntList(user.getUserId());
+				
+				
+					Push push = new Push();
+					
+					push.setBadge(1);
+					push.setOs(user.getOsType());
+					push.setPushKey(user.getPushkey());
+					push.setMsgType(Push.MSG_TYPE_NOT_CHECKED);
+					push.setUserid(user.getUserId());
+					push.setStatus(0);
+					push.setServiceId("RECOVER");
+					push.setPushType(1);							
+					push.setMsg(message);
+					push.setMsgKey("0");
+					pushDao.addPush(push);
+					
+				
+				
+			}
+			
+		}
+		
+	}
+
+	
+
+	//@Scheduled(fixedDelay = 10000) // 5초마다 실행한다.
+	@Scheduled(cron = "* * 10 * * ?") // 매분마다 실행한다. 초 분 시 일 월 주(년)
+	public void noCvScheduler() {
+		
+		// 오전 10시에 가입한지 1일, 1년 된 사용자에게 CV-Risk 알림 발송
+		
+		String today = T.getToday();
+		List list =userdao.getUserListcvrisk(today);
+		String message = "CV-RISK 를 등록해 주세요";
+		for (int i=0; i<list.size(); i++) {
+			User user = (User) list.get(i);
+			System.out.println(user.getUserId());
+			if (user.getPushkey().equals("") == false) {
+				
+				Push push = new Push();
+				
+				push.setBadge(1);
+				push.setOs(user.getOsType());
+				push.setPushKey(user.getPushkey());
+				push.setMsgType(Push.MSG_TYPE_CV_RISK);
+				push.setUserid(user.getUserId());
+				push.setStatus(0);
+				push.setServiceId("RECOVER");
+				push.setPushType(1);							
+				push.setMsg(message);
+				push.setMsgKey("0");
+				pushDao.addPush(push);
+			}
+			
+		}
+		
+	}
+
+	
+
+	//@Scheduled(fixedDelay = 10000) // 5초마다 실행한다.
+	@Scheduled(cron = "* * 15 * * ?") // 매분마다 실행한다. 초 분 시 일 월 주(년)
+	public void noPeriodScheduler() {
+		
+		// 오후 3시에 관리주기 변경 대상자에게 알림
+		String today = T.getToday();
+		String bloodBefore =T.getDateAdd(today, -2); //혈당
+		
+		String before4 = T.getDateAdd(today, -6); //혈압
+		String after3 = T.getDateAdd(before4, -1); 
+		String before3 = T.getDateAdd(after3, -6);
+		String after2 = T.getDateAdd(before3, -1);
+		String before2 = T.getDateAdd(after2, -6);
+		String after = T.getDateAdd(before2, -1);
+		String before = T.getDateAdd(after, -6);
+		
+		//혈압 푸시 
+		List list = userdao.getUserpressListCperiod(today,before,after,before2,after2,before3,after3,before4);
+	
+		for (int i=0; i<list.size(); i++) {
+			User user = (User) list.get(i);
+			String message = "관리주기 변경입니다.";
+			UserCnt uc = ucntDao.getUserCntList(user.getUserId());
+			if (user.getPushkey().equals("") == false) {
+				if(uc!=null){
+					if(uc.getPressStatus()==0){//변경 안한사람이면 푸시보내기
+						Push push = new Push();
+						
+						push.setBadge(1);
+						push.setOs(user.getOsType());
+						push.setPushKey(user.getPushkey());
+						push.setMsgType(Push.MSG_TYPE_CHANGE_PERIOD);
+						push.setUserid(user.getUserId());
+						push.setStatus(0);
+						push.setServiceId("RECOVER");
+						push.setPushType(1);							
+						push.setMsg(message);
+						push.setMsgKey("0");
+						pushDao.addPush(push);
+					}
+				}
+			}
+			
+		}
+		
+		//혈당 푸시 
+		List bloodlist = userdao.getUserbloodListCperiod(today,bloodBefore);
+	
+		for (int i=0; i<bloodlist.size(); i++) {
+			User user = (User) bloodlist.get(i);
+			String message = "관리주기 변경입니다.";
+			UserCnt uc = ucntDao.getUserCntList(user.getUserId());
+			if (user.getPushkey().equals("") == false) {
+			
+				if(uc!=null){
+					if(uc.getBloodStatus()==0){
+						Push push = new Push();
+						
+						push.setBadge(1);
+						push.setOs(user.getOsType());
+						push.setPushKey(user.getPushkey());
+						push.setMsgType(Push.MSG_TYPE_CHANGE_PERIOD);
+						push.setUserid(user.getUserId());
+						push.setStatus(0);
+						push.setServiceId("RECOVER");
+						push.setPushType(1);							
+						push.setMsg(message);
+						push.setMsgKey("0");
+						pushDao.addPush(push);
+					}
+				}
+			}
+			
+		}
+		
+		
+
+	}
+}

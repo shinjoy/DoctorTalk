@@ -1,0 +1,110 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Counsel;
+
+
+
+public class CounselDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper counselMapper = new RowMapper() {
+		public Counsel mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Counsel counsel = new Counsel();
+			counsel.setCounselorSeq(rs.getInt("counselor_seq"));
+			counsel.setUserId(rs.getString("user_id"));
+			counsel.setCounselTime(rs.getString("counsel_time"));
+			counsel.setRegDate(rs.getString("reg_date"));
+			return counsel;
+		}
+	};
+	//상담예약
+	public void addcounsel(Counsel counsel) {
+		String query = "" +
+				"INSERT INTO T_NF_COUNSEL " +
+				"	(user_id, counsel_time, reg_date) " +
+				"VALUES " +
+				"	(?, ?, getDate()) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			
+			counsel.getUserId(),
+			counsel.getCounselTime()
+		
+		});
+	}
+	//정보가져오기
+	public int getcounsel(String user_id,String starttime,String endtime) {
+		String query = "" + 
+				"SELECT count(*) " +
+				"FROM T_NF_COUNSEL " +
+				"WHERE user_id = ? and reg_date between  ?  and  ?  ";
+		return this.jdbcTemplate.queryForInt(query, new Object[] { user_id,starttime,endtime }, this.counselMapper);
+	}
+
+	public void deletecounsel(String counselor_seq) {
+		String query = "DELETE FROM T_NF_COUNSEL WHERE counselor_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { counselor_seq });
+	}
+
+	public void updatecounsel(Counsel counsel) { 
+		String query = "" + 
+				"UPDATE T_NF_COUNSEL SET " +
+				"	counselor_seq = ?, " +
+				"	user_id = ?, " +
+				"	counsel_time = ?, " +
+				"	reg_date = ? " +
+				"WHERE counselor_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			counsel.getCounselorSeq(),
+			counsel.getUserId(),
+			counsel.getCounselTime(),
+			counsel.getRegDate()
+		});
+	}
+
+	public Counsel getcounsel(String counselor_seq) {
+		String query = "" + 
+				"SELECT counselor_seq, user_id, counsel_time, reg_date " +
+				"FROM T_NF_COUNSEL " +
+				"WHERE counselor_seq = ? ";
+		return (Counsel)this.jdbcTemplate.queryForObject(query, new Object[] { counselor_seq }, this.counselMapper);
+	}
+	
+	public int getcounselrev(String user_id) {
+		String query = "" + 
+				"SELECT count(*) " +
+				"FROM T_NF_COUNSEL " +
+				"WHERE user_id = ? ";
+		return this.jdbcTemplate.queryForInt(query, new Object[] { user_id }, this.counselMapper);
+	}
+
+	public List<Counsel> getcounselList(int page, int itemCountPerPage) {
+		String query = "" +
+				"SELECT TOP "+ itemCountPerPage +" counselor_seq, user_id, counsel_time, reg_date " +
+				"FROM T_NF_COUNSEL " +
+				"WHERE counselor_seq <= ( " +
+				"	SELECT MIN(counselor_seq) " +
+				"	FROM ( " +
+				"		SELECT TOP "+ ((page-1) * itemCountPerPage + 1) +" counselor_seq " +
+				"		FROM T_NF_COUNSEL " +
+				"		ORDER BY counselor_seq DESC " +
+				"	) AS A) " +
+				"ORDER BY counselor_seq DESC";
+		return (List<Counsel>)this.jdbcTemplate.query(query, this.counselMapper);
+	}
+	
+	
+
+}

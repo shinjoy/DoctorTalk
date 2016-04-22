@@ -1,0 +1,50 @@
+package kr.nomad.mars.dto;
+
+public class UserBlood {
+	
+	int bloSeq = 0;
+	String userId = "";
+	int bloodTime = 0;
+	int bloodKind = 0;
+	int bloodNum = 0;
+	String regDate = "";
+	
+	public int getBloSeq() {
+		return bloSeq;
+	}
+	public void setBloSeq(int bloSeq) {
+		this.bloSeq = bloSeq;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public int getBloodTime() {
+		return bloodTime;
+	}
+	public void setBloodTime(int bloodTime) {
+		this.bloodTime = bloodTime;
+	}
+	public int getBloodKind() {
+		return bloodKind;
+	}
+	public void setBloodKind(int bloodKind) {
+		this.bloodKind = bloodKind;
+	}
+	public int getBloodNum() {
+		return bloodNum;
+	}
+	public void setBloodNum(int bloodNum) {
+		this.bloodNum = bloodNum;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+   
+
+}

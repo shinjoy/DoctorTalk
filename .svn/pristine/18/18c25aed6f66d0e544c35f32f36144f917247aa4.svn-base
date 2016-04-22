@@ -1,0 +1,211 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header.jsp"  %>
+
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+ 		aside.setActive(4,3);
+		searchList(listForm,1);
+	});
+
+	function searchList(listForm,page) {
+		var param = {
+			keyword		: 	listForm.keyword.value,
+			page		:	page
+		};
+		
+		$.ajax({
+			type:"POST",
+			url:"/admin/doctor_index_input/cholesterol_list.go",
+			dataType:"html",
+			data:param,
+			success:function(msg){
+				$("#contents-list").html(msg);
+			}
+		});
+		return false;
+	}
+	
+
+	
+
+function addListForm(frm) {
+		
+		if (frm.comment.value == "") {
+			alert("내용을 입력해주세요.");
+			return false;
+		}
+		
+		var param = {
+			comSeq  : frm.comSeq.value,
+ 			askind	: frm.askind.value,
+			comment	: frm.comment.value
+		};
+		
+		$.ajax({
+			type:"POST",
+			url:"/admin/doctor_index_input/cholesterol_edit_do.go",
+			dataType:"json",
+			data:param,
+			success:function(json){
+				alert(json.message);
+				if (json.result) {
+					document.location.reload();
+				}
+			}
+		});
+
+		return false;
+	}
+	
+	function answerListForm(frm) {
+		
+		if (frm.comment.value == "") {
+			alert("내용을 입력해주세요.");
+			return false;
+		}
+		
+		var param = {
+			comSeq  : frm.comSeq.value,
+ 			askind	: frm.askind.value,
+ 			ansType	: frm.ansType.value,
+			comment	: frm.comment.value
+		};
+		
+		$.ajax({
+			type:"POST",
+			url:"/admin/doctor_index_input/cholesterol_edit_do.go",
+			dataType:"json",
+			data:param,
+			success:function(json){
+				alert(json.message);
+				if (json.result) {
+					document.location.reload();
+				}
+			}
+		});
+
+		return false;
+	}
+	
+
+	function ListPreForm(frm) {
+		
+		if (frm.comment.value == "") {
+			alert("내용을 입력해주세요.");
+			return false;
+		}
+		
+		var param = {
+			comSeq  : frm.comSeq.value,
+			comment	: frm.comment.value
+		};
+		
+		$.ajax({
+			type:"POST",
+			url:"/admin/doctor_index_input/cholesterol_edit_table_do.go",
+			dataType:"json",
+			data:param,
+			success:function(json){
+				alert(json.message);
+				if (json.result) {
+					document.location.reload();
+				}
+			}
+		});
+
+		return false;
+	}
+	
+</script>
+
+</head>
+<body>
+
+<%@ include file="/WEB-INF/views/admin/admin_header.jsp"  %>
+
+<section class="main-cover main-row">
+	<section id="main">
+		
+		<%@ include file="/WEB-INF/views/admin/admin_menu.jsp"  %>
+
+		<section id="contents">
+			<header class="panel">
+				 ■ 홈 > 닥터톡 - 지표입력 > 콜레스테롤
+			</header>
+		
+			<div class="contents-block">
+			
+				<h1>콜레스테롤</h1>
+				
+				<div class="contents-main">
+				
+					<form method="post" name="listForm" id="listForm" onsubmit="return searchList(this,1); return false;">
+						<div class="contents-top">
+							<div class="top-tools">
+								<div class="search-tool">
+									<input type="text" name="keyword" value="${keyword}" placeholder="제목/내용 검색" class="itext">
+									<button type="submit" class="btn" >검색</button>
+								</div>
+							</div>
+						</div>
+						
+						</form>	
+					<div id="contents-list">
+						</div>
+						
+						<div style="margin-top:20px; ">
+							<h2 >추가하기</h2>
+							<form method="post" name="addForm" id="addForm" onsubmit="return addListForm(this,1); return false;">
+							<table class="list" style="border:1px solid #ddd;">
+								<input type="hidden" name="comSeq"  value="0">
+									<tbody>
+										<td> 
+											<select name="askind" id="askind" class="select-search">
+												<option value="1">안내문</option>
+												<option value="2">질문</option>
+											</select> 
+										</td>
+										<td>  <input type="text" class="itext"  name="comment" style="width:300px;"> </td>
+										<td> <button class="btn">등록</button>  </td>
+									</tbody>
+							</table>		
+							</form>
+						</div>
+														
+						<div style="margin-top:20px;">
+							<h2 style="margin-left:10px;">추가하기</h2>
+							<form method="post" name="answerForm" id="answerForm" onsubmit="return answerListForm(this,1); return false;">
+								<table class="list" style="border:1px solid #ddd;">
+									<input type="hidden" name="comSeq"  value="0">
+									<tbody>
+										<td> 
+											<select name="askind" id="askind" class="select-search">
+												<option value="3">답변</option>
+											</select> 
+											<select name="ansType" id="ansType" class="select-search">
+												<option value="0">입력</option>
+												<option value="1">선택</option>	
+											</select> 
+										</td>	
+										<td><input type="text" class="itext" name="comment" style=" width:300px; "></td>
+<!-- 										<td>goto<input type="text"  name="move" class="itext" > </td> -->
+
+										<td> <button class="btn">등록</button>  </td>
+									</tbody>
+								</table>
+							</form>		
+						</div>
+					
+				</div>
+			</div>
+		</section>
+	</section>
+</section>
+
+<%@ include file="/WEB-INF/views/admin/admin_footer.jsp"  %>
+
+</body>
+</html>

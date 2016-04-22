@@ -1,0 +1,252 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import kr.nomad.mars.dto.Notice;
+import kr.nomad.mars.dto.Qna;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+public class QnaDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper qnaMapper = new RowMapper() {
+		public Qna mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Qna qna = new Qna();
+			qna.setQnaSeq(rs.getInt("qna_seq"));
+			qna.setUserId(rs.getString("user_id"));
+			qna.setTitle(rs.getString("title"));
+			qna.setContentsHtml(rs.getString("contents_html"));
+			qna.setContentsText(rs.getString("contents_text"));
+			qna.setLinkUrl(rs.getString("link_url"));
+			qna.setFileName(rs.getString("file_name"));
+			qna.setDepth(rs.getInt("depth"));
+			qna.setPseq(rs.getInt("pseq"));
+			qna.setCateKind(rs.getInt("cate_kind"));
+			return qna;
+		}
+	};
+
+	public void addQna(final Qna qna) {
+		String query = "" +
+				"INSERT INTO T_NF_DOCTOR_QNA " +
+				"	(user_id, title, contents_html, contents_text, link_url, file_name, depth, pseq, cate_kind) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			qna.getUserId(),
+			qna.getTitle(),
+			qna.getContentsHtml(),
+			qna.getContentsText(),
+			qna.getLinkUrl(),
+			qna.getFileName(),
+			qna.getDepth(),
+			qna.getPseq(),
+			qna.getCateKind()
+		});
+	}
+
+	public void deleteQna(int qna_seq) {
+		String query = "DELETE FROM T_NF_DOCTOR_QNA WHERE qna_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { qna_seq });
+	}
+
+	public void updateQna(Qna qna) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_QNA SET " +
+				"	user_id = ?, " +
+				"	title = ?, " +
+				"	contents_html = ?, " +
+				"	contents_text = ?, " +
+				"	link_url = ?, " +
+				"	file_name = ?, " +
+				"	depth = ?, " +
+				"	pseq = ?, " +
+				"	cate_kind = ? " +
+				"WHERE qna_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			qna.getUserId(),
+			qna.getTitle(),
+			qna.getContentsHtml(),
+			qna.getContentsText(),
+			qna.getLinkUrl(),
+			qna.getFileName(),
+			qna.getDepth(),
+			qna.getPseq(),
+			qna.getCateKind(),
+			qna.getQnaSeq()
+		});
+	}
+
+	public Qna getQna(int qna_seq) {
+		String query = "" + 
+				"SELECT qna_seq, user_id, title, contents_html, contents_text, link_url, file_name, depth, pseq, cate_kind " +
+				"FROM T_NF_DOCTOR_QNA " +
+				"WHERE qna_seq = ? ";
+		return (Qna)this.jdbcTemplate.queryForObject(query, new Object[] { qna_seq }, this.qnaMapper);
+	}
+	
+	public List<Qna> getQnaList(int page, int itemCountPerPage) {
+		
+		List<Qna> result = null;
+
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "		SELECT "
+				+ "			* "
+				+ "		FROM T_NF_DOCTOR_QNA "
+				+ "		ORDER BY qna_seq desc "
+				+ ") AS row LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+				
+		result = (List<Qna>)this.jdbcTemplate.query(query,new Object[] {}, this.qnaMapper);
+		
+		return result;
+	}
+
+	public int getCount() {
+		int result = 0;		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_DOCTOR_QNA";
+		result = this.jdbcTemplate.queryForInt(query,new Object[] {});
+				
+		return result;
+	}
+	
+	
+
+	public List<Qna> getQnaList(String keyword, int page, int itemCountPerPage) {
+		String query = ""
+				+ "    SELECT * FROM ( "
+				+ "         SELECT "
+				+ "            * "
+				+ "         FROM T_NF_DOCTOR_QNA "
+				+ "         WHERE (title like ? OR contents_text like ? ) "
+				+ "			ORDER BY qna_seq DESC "
+				+ "    ) AS a LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+		return (List<Qna>) this.jdbcTemplate.query(query,new Object[] {"%" + keyword + "%","%" + keyword + "%"}, this.qnaMapper);
+	}
+
+	public int getCount(String keyword) {
+		String query = " SELECT COUNT(*) FROM T_NF_DOCTOR_QNA WHERE (title like ? OR contents_text like ? ) ";
+		return this.jdbcTemplate.queryForInt(query, new Object[] {"%"+ keyword+"%","%" + keyword + "%"});
+	}
+	
+	
+	// 모바일 도움말 리스트
+	
+	public List<Qna> getQnaList(int page, int itemCountPerPage,int category) {
+		
+		List<Qna> result = null;
+
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "		SELECT "
+				+ "			* "
+				+ "		FROM T_NF_DOCTOR_QNA "
+				+ "		WHERE cate_kind = ? "
+				+ "		ORDER BY qna_seq desc "
+				+ ") AS row LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+				
+		result = (List<Qna>)this.jdbcTemplate.query(query,new Object[] {category}, this.qnaMapper);
+		
+		return result;
+	}
+
+	public int getCount(int category) {
+		int result = 0;		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_DOCTOR_QNA WHERE cate_kind = ?";
+		result = this.jdbcTemplate.queryForInt(query,new Object[] {category});
+				
+		return result;
+	}
+	
+	
+
+	public List<Qna> getQnaList(String keyword, int page, int itemCountPerPage,int category) {
+		String query = ""
+				+ "    SELECT * FROM ( "
+				+ "         SELECT "
+				+ "            * "
+				+ "         FROM T_NF_DOCTOR_QNA "
+				+ "			WHERE (cate_kind = ? ) AND (title like ? OR contents_text like ? ) "
+				+ "			ORDER BY qna_seq DESC "
+				+ "    ) AS a LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+		return (List<Qna>) this.jdbcTemplate.query(query,new Object[] {category,"%" + keyword + "%","%" + keyword + "%"}, this.qnaMapper);
+	}
+
+	public int getCount(String keyword,int category) {
+		String query = " SELECT COUNT(*) FROM T_NF_DOCTOR_QNA WHERE (cate_kind = ? ) AND (title like ? OR contents_text like ? )";
+		return this.jdbcTemplate.queryForInt(query, new Object[] {category,"%"+ keyword+"%","%" + keyword + "%"});
+	}
+	
+	
+	
+	// 관리자 QNA 리스트
+	
+	/*
+	 * 모바일 공지사항 (일반, 특별)
+	 */
+	public List<Qna> getQnaListAdmin(int page, int itemCountPerPage) {
+		
+		List<Qna> result = null;
+
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "		SELECT "
+				+ "			* "
+				+ "		FROM T_NF_DOCTOR_QNA "
+				+ "		ORDER BY qna_seq desc "
+				+ ") AS row LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+				
+		result = (List<Qna>)this.jdbcTemplate.query(query,new Object[] {}, this.qnaMapper);
+		
+		return result;
+	}
+	
+	/*
+	 * 모바일 공지사항 카운트 (일반, 특별)
+	 */
+	public int getQnaCount() {
+		int result = 0;		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_DOCTOR_QNA";
+		result = this.jdbcTemplate.queryForInt(query,new Object[] {});
+				
+		return result;
+	}
+	
+	
+	
+	public List<Qna> getQnaListAdmin(String keyword, int page, int itemCountPerPage) {
+		String query = ""
+				+ "    SELECT * FROM ( "
+				+ "         SELECT "
+				+ "            * "
+				+ "         FROM T_NF_DOCTOR_QNA "
+				+ "         WHERE (title like ? OR contents_text like ? ) "
+				+ "			ORDER BY qna_seq DESC "
+				+ "    ) AS a LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+		return (List<Qna>) this.jdbcTemplate.query(query,new Object[] {"%" + keyword + "%","%" + keyword + "%"}, this.qnaMapper);
+	}
+
+	public int getQnaCount(String keyword) {
+		String query = " SELECT COUNT(*) FROM T_NF_DOCTOR_NOTICE WHERE (title like ? OR contents_text like ? ) ";
+		return this.jdbcTemplate.queryForInt(query, new Object[] {"%"+ keyword+"%","%" + keyword + "%"});
+	}
+	
+	
+
+	
+	
+
+	
+	
+
+}

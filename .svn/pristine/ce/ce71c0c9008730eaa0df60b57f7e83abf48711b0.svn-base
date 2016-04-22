@@ -1,0 +1,141 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Day;
+import kr.nomad.mars.dto.Magazine;
+import kr.nomad.util.T;
+
+public class MagazineDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper magazineMapper = new RowMapper() {
+		public Magazine mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Magazine magazine = new Magazine();
+			magazine.setmSeq(rs.getInt("m_seq"));
+			magazine.setContents(rs.getString("contents"));
+			magazine.setMonth(rs.getString("month"));
+			magazine.setTitle(rs.getString("title"));
+			magazine.setFileName(rs.getString("file_name"));
+			magazine.setSubTitle(rs.getString("sub_title"));
+			magazine.setThumFile(rs.getString("thum_file"));
+			return magazine;
+		}
+	};
+
+
+	//처음 리스트
+	
+	public List<Magazine> getMagagineList() {
+		String query = "" +
+				"SELECT * FROM T_NF_DOCTOR_MAGAZINE order by month desc";
+		return (List<Magazine>)this.jdbcTemplate.query(query, this.magazineMapper);
+	}
+	
+	//처음 뷰
+	
+	public Magazine getMagagine(int seq) {
+		String query = "" +
+				"SELECT * FROM T_NF_DOCTOR_MAGAZINE where m_seq = ?";
+		return (Magazine)this.jdbcTemplate.queryForObject(query,  new Object[] { seq } ,this.magazineMapper);
+	}
+
+	
+	
+	//월별 상위  
+	
+	public Magazine getTopMagagine(int maga_seq) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_MAGAGINE " +
+				"WHERE maga_seq = ? and askind = 4";
+		return (Magazine)this.jdbcTemplate.queryForObject(query, new Object[] { maga_seq }, this.magazineMapper);
+	}
+	
+	//월별 하위  
+	
+		public List<Magazine> getSubMagagine(int maga_seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE pseq = ? and askind = 5 ";
+			return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { maga_seq }, this.magazineMapper);
+		}
+		
+/*	//1개월 컨텐츠 질문
+		
+	public List<Magazine> getmglist(String month) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE month = ? and askind = 1"+
+					"ORDER BY sort ASC";
+			
+		return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { month } , this.magazineMapper);
+	}
+	
+	//답변
+	public List<Magazine> getmagaAnswerList(int seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE askind = 2 and pseq =?" + 
+					"ORDER BY sort ASC ";
+		return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { seq }, this.magazineMapper);
+	}		
+	
+	
+
+	//1개월지표질문
+	public List<Magazine> getmonMagagine() {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_MAGAGINE " +
+				"WHERE askind = 6"+
+				"ORDER BY sort ASC";
+		return (List<Magazine>)this.jdbcTemplate.query(query, this.magazineMapper);
+	}
+	//1개월지표답변
+	public List<Magazine> getmonAnswerList(int seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE askind = 7 and pseq = ? " + 
+					"ORDER BY sort ASC ";
+		return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { seq }, this.magazineMapper);
+	}
+	
+	//1주지표질문
+	public List<Magazine> getweekMagagine() {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_MAGAGINE " +
+				"WHERE askind = 8"+
+				"ORDER BY sort ASC";
+		return (List<Magazine>)this.jdbcTemplate.query(query, this.magazineMapper);
+	}
+	//1주지표답변
+	public List<Magazine> getweekAnswerList(int seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE askind = 9 and pseq = ? " + 
+					"ORDER BY sort ASC ";
+		return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { seq }, this.magazineMapper);
+	}*/
+					
+
+	
+
+}

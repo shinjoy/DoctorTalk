@@ -1,0 +1,351 @@
+package kr.nomad.mars.dto;
+
+import kr.nomad.util.T;
+
+public class User {
+
+	String userId = "";
+	String password = "";
+	int userType = 0;
+	String userName = "";
+	String phoneNumber = "";
+	String birthday = "";
+	int gender = 0;
+	String regDate = "";
+	String lastLogindate = "";
+	int loginNaver = 0;
+	int loginKakao = 0;
+	String osType = "";
+	String osVersion = "";
+	String appVersion = "";
+	String deviceName = "";
+	String deviceId = "";
+	String pushkey = "";
+	int usePushservice = 0;
+	int status = 0;
+	String loginStatus = "";
+	String fileName = "";
+	String userTypeText = "";
+	String genderText = "";
+	int userMed = 0;
+	String belongTo = "";
+	int noticeBadge = 0;
+	int userAge = 0;
+	String heiwieght = "";
+	String blood = "";
+	String press = "";
+	String col = "";
+	
+	String aimmedId = "";	//에임메드 계정
+	String groupCode = "";	//에임메드 그룹코드
+	String groupName = "";	//에임메드 그룹이름
+
+	public static int MAN = 1;
+	public static int WOMAN = 2;
+
+	public static int USERTYPE_ADMIN = 1; // 최고관리자
+	public static int USERTYPE_NORMAL = 2; // 일반관리자
+	public static int USERTYPE_INQUIRY = 3; // 조회관리자
+
+	public String getGenderText() {
+
+		if (this.gender == MAN) {
+			return "남자";
+		} else if (this.gender == WOMAN) {
+			return "여자";
+		} else {
+			return "";
+		}
+	}
+	
+	public int getUserAge() {
+		if (this.birthday.equals("") == false) {
+			try {
+				int birthYear = Integer.parseInt(birthday.split("-")[0]);
+				int thisYear = Integer.parseInt(T.getTodayYear());
+				if (birthYear == 0) {
+					return 0;
+				} else {
+					return thisYear - birthYear;
+				}
+			} catch (Exception e) {
+				return 0;
+			}
+		} else {
+			return 0;
+		}
+	}
+	
+	
+	
+
+	// public int getUserAge() {
+	// int thisYear = Integer.parseInt(T.getTodayYear());
+	// if (birthYear == 0) {
+	// return 0;
+	// } else {
+	// return thisYear - this.birthYear;
+	// }
+	// }
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public int getNoticeBadge() {
+		return noticeBadge;
+	}
+
+	public void setNoticeBadge(int noticeBadge) {
+		this.noticeBadge = noticeBadge;
+	}
+
+	public String getBelongTo() {
+		return belongTo;
+	}
+
+	public void setBelongTo(String belongTo) {
+		this.belongTo = belongTo;
+	}
+
+	public int getUserMed() {
+		return userMed;
+	}
+
+	public void setUserMed(int userMed) {
+		this.userMed = userMed;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public int getUserType() {
+		return userType;
+	}
+
+	public void setUserType(int userType) {
+		this.userType = userType;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public String getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(String birthday) {
+		this.birthday = birthday;
+	}
+
+	public int getGender() {
+		return gender;
+	}
+
+	public void setGender(int gender) {
+		this.gender = gender;
+	}
+
+	public String getRegDate() {
+		return regDate;
+	}
+
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+
+	public String getLastLogindate() {
+		return lastLogindate;
+	}
+
+	public void setLastLogindate(String lastLogindate) {
+		this.lastLogindate = lastLogindate;
+	}
+
+	public int getLoginNaver() {
+		return loginNaver;
+	}
+
+	public void setLoginNaver(int loginNaver) {
+		this.loginNaver = loginNaver;
+	}
+
+	public int getLoginKakao() {
+		return loginKakao;
+	}
+
+	public void setLoginKakao(int loginKakao) {
+		this.loginKakao = loginKakao;
+	}
+
+	public String getOsType() {
+		return osType;
+	}
+
+	public void setOsType(String osType) {
+		this.osType = osType;
+	}
+
+	public String getOsVersion() {
+		return osVersion;
+	}
+
+	public void setOsVersion(String osVersion) {
+		this.osVersion = osVersion;
+	}
+
+	public String getAppVersion() {
+		return appVersion;
+	}
+
+	public void setAppVersion(String appVersion) {
+		this.appVersion = appVersion;
+	}
+
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getPushkey() {
+		return pushkey;
+	}
+
+	public void setPushkey(String pushkey) {
+		this.pushkey = pushkey;
+	}
+
+	public int getUsePushservice() {
+		return usePushservice;
+	}
+
+	public void setUsePushservice(int usePushservice) {
+		this.usePushservice = usePushservice;
+	}
+
+	public String getLoginStatus() {
+		return loginStatus;
+	}
+
+	public void setLoginStatus(String loginStatus) {
+		this.loginStatus = loginStatus;
+	}
+
+	public String getUserTypeText() {
+		return userTypeText;
+	}
+
+	public void setUserTypeText(String userTypeText) {
+		this.userTypeText = userTypeText;
+	}
+
+	public void setGenderText(String genderText) {
+		this.genderText = genderText;
+	}
+
+	public String getHeiwieght() {
+		return heiwieght;
+	}
+
+	public void setHeiwieght(String heiwieght) {
+		this.heiwieght = heiwieght;
+	}
+
+	public String getBlood() {
+		return blood;
+	}
+
+	public void setBlood(String blood) {
+		this.blood = blood;
+	}
+
+	public String getPress() {
+		return press;
+	}
+
+	public void setPress(String press) {
+		this.press = press;
+	}
+
+	public String getCol() {
+		return col;
+	}
+
+	public void setCol(String col) {
+		this.col = col;
+	}
+
+	public String getAimmedId() {
+		return aimmedId;
+	}
+
+	public void setAimmedId(String aimmedId) {
+		this.aimmedId = aimmedId;
+	}
+
+	public String getGroupCode() {
+		return groupCode;
+	}
+
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
+}

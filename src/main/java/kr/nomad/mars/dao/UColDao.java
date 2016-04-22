@@ -1,0 +1,289 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import kr.nomad.mars.dto.UserCol;
+import kr.nomad.mars.dto.UserWeight;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+public class UColDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper usercolMapper = new RowMapper() {
+		public UserCol mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserCol usercol = new UserCol();
+			usercol.setColSeq(rs.getInt("col_seq"));
+			usercol.setUserId(rs.getString("user_id"));
+			usercol.setCol(rs.getInt("col"));
+			usercol.setLdl(rs.getInt("ldl"));
+			usercol.setTg(rs.getInt("tg"));
+			usercol.setHdl(rs.getInt("hdl"));
+			usercol.setRegDate(rs.getString("reg_date"));
+			usercol.setComment(rs.getString("comment"));
+			return usercol;
+		}
+	};
+	private RowMapper usercolMapper2 = new RowMapper() {
+		public UserCol mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserCol usercol = new UserCol();
+			usercol.setColSeq(rs.getInt("col_seq"));
+			usercol.setUserId(rs.getString("user_id"));
+			usercol.setCol(rs.getInt("col"));
+			usercol.setLdl(rs.getInt("ldl"));
+			usercol.setTg(rs.getInt("tg"));
+			usercol.setHdl(rs.getInt("hdl"));
+			usercol.setRegDate(rs.getString("reg_date"));
+		
+			return usercol;
+		}
+	};
+	
+	//해당 아이디 최근데이터 하나만 가지고 오기
+	public UserCol UserCol(String userId) {
+		String query = ""
+				+ "	SELECT  * "
+				+ "	FROM T_NF_USER_CHOLESTEROL "
+				+ "	WHERE user_id = ? "
+				+ "	ORDER BY reg_date desc "
+				+ "	LIMIT 1 ";
+		 try {
+			return (UserCol)this.jdbcTemplate.queryForObject(query, new Object[] { userId } ,this.usercolMapper);
+		} catch (Exception e) {
+			return new UserCol();
+		}
+		
+	}	
+	
+	
+	//해당 아이디 데이터삭제
+	
+	public void deleteUserCol(String id) {
+		String query = "DELETE FROM T_NF_USER_CHOLESTEROL WHERE user_id = ?  ";
+		this.jdbcTemplate.update(query, new Object[] { id  });
+	}	
+	
+	public int getCount(String userId, String date) {
+	    String query = " SELECT COUNT(*) FROM T_NF_USER_CHOLESTEROL WHERE user_id =  ? AND DATE_FORMAT(reg_date, '%Y-%m-%d') = ?  ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] { userId, date });
+	}
+	
+	//콜레스테롤 등록
+	public void addUserCol(final UserCol usercol) {
+		String query = "" +
+				"INSERT INTO T_NF_USER_CHOLESTEROL " +
+				"	(user_id, col, ldl, tg, hdl, reg_date,comment) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, SYSDATE(),?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+		
+			usercol.getUserId(),
+			usercol.getCol(),
+			usercol.getLdl(),
+			usercol.getTg(),
+			usercol.getHdl(),
+			usercol.getComment()
+		
+		});
+	}
+	public void updateUserCol(UserCol usercol) {
+		String query = "" + 
+				"UPDATE T_NF_USER_CHOLESTEROL SET " +
+				"	col = ?, " +
+				"	ldl = ?, " +
+				"	tg = ?, " +
+				"	hdl = ? " +
+				"WHERE col_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+				usercol.getCol(),
+				usercol.getLdl(),
+				usercol.getTg(),
+				usercol.getHdl(),
+				usercol.getColSeq()
+		});
+	}
+	
+	public void updateUserComment(int seq,String comment) {
+		String query = "" + 
+				"UPDATE T_NF_USER_CHOLESTEROL SET " +
+
+				"  comment= ? "+
+				" WHERE col_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {comment,seq});
+	}
+	
+	//콜레스테롤 차트
+	public List<UserCol> getUserCol(String id) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_USER_CHOLESTEROL " +
+				"WHERE user_id = ? ORDER BY col_seq DESC ";
+		return (List<UserCol>)this.jdbcTemplate.query(query, new Object[] { id }, this.usercolMapper);
+	}
+	
+	public UserCol getUserComment(int Seq) { 
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_USER_CHOLESTEROL "
+				+ "	WHERE col_seq = ? ";
+		try {
+			return (UserCol)this.jdbcTemplate.queryForObject(query, new Object[] {Seq}, this.usercolMapper);
+		} catch (Exception e) {
+			return new UserCol();
+		}
+	}
+	
+	//해당 seq 데이터삭제
+	
+	public void deleteUserCol(int seq) {
+		String query = "DELETE FROM T_NF_USER_CHOLESTEROL WHERE col_seq= ? ";
+		this.jdbcTemplate.update(query, new Object[] { seq  });
+	}	
+	
+	
+	//차트데이터
+	public List<UserCol> getUserCol(String id,int page,int itemCountPerPage) { 
+			String query = "" 
+					+ " SELECT * FROM ("
+					+"		select"
+					+ " 		* "
+					+ " 	from T_NF_USER_CHOLESTEROL "
+					+ "		where user_id = ? "
+					+ "		ORDER BY reg_date DESC "
+					+ ") AS a LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+			
+		return (List<UserCol>)this.jdbcTemplate.query(query, new Object[] { id}, this.usercolMapper);
+	}	
+
+	//평균
+	private RowMapper<HashMap<String, Integer>> avgMapper = new RowMapper<HashMap<String, Integer>>() {
+		public HashMap<String, Integer> mapRow(ResultSet rs, int rowNum) throws SQLException {
+			HashMap<String, Integer> hm = new HashMap<String, Integer>();
+			hm.put("avgCol", rs.getInt("avg_col"));
+			hm.put("avgLdl", rs.getInt("avg_ldl"));
+			hm.put("avgTg", rs.getInt("avg_Tg"));
+			hm.put("avgHdl", rs.getInt("avg_Hdl"));
+			return hm;
+		}
+	};
+	public UserCol getUserdesc(String id) { 
+		String query = ""
+				+ "	select * "
+				+ "	from T_NF_USER_CHOLESTEROL "
+				+ "	where user_id = ? "
+				+ " order by reg_date desc "
+				+ "	limit 1 "; 
+		try{
+			return (UserCol)this.jdbcTemplate.queryForObject(query, new Object[] {id }, this.usercolMapper);
+		}catch(Exception e){
+			return new UserCol();
+		}
+}
+	public HashMap getUseravg(String id,String now,String before) { 
+			String query = ""
+					+ "	select "
+					+ "		avg(col) as avg_col, "
+					+ "		avg(ldl) as avg_ldl, "
+					+ "		avg(tg) as avg_tg, "
+					+ "		avg(hdl) as avg_hdl "
+					+ "	from "
+					+ "		T_NF_USER_CHOLESTEROL "
+					+ "	where user_id = ?  and DATE_FORMAT(reg_date, '%Y-%m-%d') between  ? and  ? "; 
+			return (HashMap)this.jdbcTemplate.queryForObject(query, new Object[] {id,before,now }, this.avgMapper);
+	}
+	public UserCol getUserCol(String userId, String date) { 
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_USER_CHOLESTEROL "
+				+ "	WHERE user_id = ? AND DATE_FORMAT(reg_date, '%Y-%m-%d') = ? ";
+		try {
+			return (UserCol)this.jdbcTemplate.queryForObject(query, new Object[] { userId, date }, this.usercolMapper);
+		} catch (Exception e) {
+			return new UserCol();
+		}
+	}
+	//차트데이터갯수
+		public int getUserColcnt(String id) { 
+				String query = "" 
+						+ "SELECT count(*) FROM "
+						+"T_NF_USER_CHOLESTEROL where user_id = ? ";
+			
+				
+			return this.jdbcTemplate.queryForInt(query, new Object[] { id });
+		}	
+	
+	
+	
+	//해당아이디의 가장 높은거 있나업나
+	
+	public UserCol getUsertopCol(String id) {
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_USER_CHOLESTEROL "
+				+ "	WHERE user_id = ? "
+				+ "	ORDER BY col_seq "
+				+ "	LIMIT 1 ";
+		
+		try {
+				return (UserCol)this.jdbcTemplate.queryForObject(query, new Object[] { id } ,this.usercolMapper);
+		} catch (Exception e) {
+			// TODO: handle exception
+				return null;
+		}
+		
+	}
+	
+	//카운터세기
+	
+	public int datacntCol(String id) {
+		String query = "SELECT count(*) FROM T_NF_USER_CHOLESTEROL "
+				+ "WHERE user_id = ? ";
+		
+		try {
+				return this.jdbcTemplate.queryForInt(query, new Object[] { id } );
+		} catch (Exception e) {
+			// TODO: handle exception
+				return 0;
+		}
+		
+	}
+	//그래프
+
+	public List<UserCol> getUserCol(String id,String now,String before) { 
+			String query = ""
+					+ "	select * "
+					+ "	from T_NF_USER_CHOLESTEROL "
+					+ "	where user_id = ? and DATE_FORMAT(reg_date, '%Y-%m-%d') between  ? and  ? "
+					+ "	order by col_seq "
+					+ "	limit 7 "; 
+			return (List<UserCol>)this.jdbcTemplate.query(query, new Object[] { id,before,now },this.usercolMapper);
+	}
+	//그래프
+	public int getUserColavg(String id,String now,String before,String kind) { 
+		String query = "" + 
+				"select avg("+kind+") from T_NF_USER_CHOLESTEROL where user_id = ? and DATE_FORMAT(reg_date, '%Y-%m-%d') between  ? and  ? "; 
+		return this.jdbcTemplate.queryForInt(query, new Object[] { id,before,now });
+}
+	//그래프
+
+	public List<UserCol> getUserCol2(String id,String now,String before) { 
+			String query = ""  
+					+ "	select 0 as col_seq, user_id,avg(col) as col, avg(ldl) as ldl, avg(tg) as tg, avg(hdl) as hdl, DATE_FORMAT(reg_date, '%Y-%m-%d') as reg_date"
+					+ "	from T_NF_USER_CHOLESTEROL "
+					+ "		where user_id = ? and DATE_FORMAT(reg_date, '%Y-%m-%d') between '"+before+"' and '"+now+"' "
+					+ "	group by user_id, DATE_FORMAT(reg_date, '%Y-%m-%d') "
+					+ "	ORDER BY reg_date ";  
+			return (List<UserCol>)this.jdbcTemplate.query(query, new Object[] { id},this.usercolMapper2);
+	}
+
+}

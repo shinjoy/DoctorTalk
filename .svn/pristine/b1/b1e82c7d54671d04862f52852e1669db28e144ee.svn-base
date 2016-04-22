@@ -1,0 +1,61 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header5.jsp"  %>
+	
+<script type="text/javascript">
+$(document).ready(function() {
+
+});
+
+//초대회원 선택
+function callInvite(id) {
+	window.location = "jscall://callInvite?"+id;
+}
+
+</script>
+<style>
+	#pop-box { padding:0; }
+	.pop-tool { position:relative; border-bottom:1px solid #aaa; margin-top:10px; padding:0 10px; }
+	.pop-tool .user-photo { width:60px; height:60px; margin:10px auto; }
+	.pop-tool .close-btn { position:absolute; top:0; right:0; }
+	.pop-title { height:40px; font-weight:bold; font-size:16px; }
+	.search-list { width:300px; height:200px; overflow-y:auto; }
+	.chat-list { width:100%; cursor:pointer; }
+	.chat-list .photo-cell { width:20px; padding:10px; }
+	.chat-list .bold { font-weight:bold; }
+	.chat-list .gray { color:#aaa; }
+	.chat-list .underline { border-bottom:1px solid #ddd; padding:10px; }
+	.chat-list .profile { width:20px; height:20px; background-size:cover; background-repeat:no-repeat; background-position:center; border-radius:12px; }
+</style>
+
+</head>
+
+<body>
+
+	<div class="pop-tool">
+		<div class="pop-title">
+			상담원  
+		</div>
+		<div class="close-btn"><img src="/images/lay_close.png" class="btn-close" onclick="pop.close();"></div>
+	</div>
+	
+	<div class="search-list">
+		<ul>
+			<c:forEach var="it" items="${list}">
+				<li onclick="callInvite('${it.userId}');">
+					<table class="chat-list">
+					<tr>
+						<td class="photo-cell sm"><div class="profile sm" style="background-image:url('${it.fileName=='' ? '/images/user_default.png' : it.fileName}');"></div></td>
+						<td class="underline">
+							<span class="bold">${it.userName}</span>
+						</td>
+					</tr>
+					</table>
+				</li>
+			</c:forEach>
+		</ul>
+	</div>
+
+</body>
+
+</html>

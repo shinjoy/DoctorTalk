@@ -1,0 +1,156 @@
+/* 기본 태그 설정 */
+* {
+	margin:0;
+	padding:0;
+}
+*:focus, a:active, a:focus, a {
+	outline:none;
+	border:none; 
+	color:#5c5c5c;
+	text-decoration:none;
+}
+body,h1,h2,h3,h4,th,td,input {
+	color:#333;
+	font-family:"돋움",dotum,sans-serif;
+	font-size:12px;
+	font-weight:normal
+}
+body {
+	background:#fff; 
+	display:block;
+	overflow-y:scroll;
+}
+a {
+	pointer:cursor;
+}
+hr {
+	display:none;
+}
+img,fieldset{
+	border:0;
+}
+ul,ol,li{
+	list-style:none;
+}
+img,input,select,textarea{
+	vertical-align:middle;
+}
+label {
+	display:block;
+	float:left;
+	text-align:left;
+}
+iframe.hidden {
+	display:none;
+}
+
+/* 기본 스타일 */
+.hidden {
+	overflow:hidden;
+	*zoom:1;
+}
+.clear {
+	clear:both;
+}
+.bold {
+	font-weight:bold;
+}
+.pointer {
+	cursor:pointer;
+}
+.center {
+	margin:0 auto; 
+}
+.matchParent {
+	width:100%; 
+}
+.float_left {
+	float:left
+}
+.float_right {
+	float:right
+}
+.text_left {
+	text-align:left
+}
+.text_right {
+	text-align:right
+}
+.text_center {
+	text-align:center
+}
+
+
+/* 글 줄이기 */
+.ellipsis {
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	-o-text-overflow:ellipsis; /*Opera 9*/
+	-ms-text-overflow:ellipsis; /* IE 8 above */
+	-mos-binding:url('ellipsis.xml#ellipsis');
+	display:block;
+}
+.ellipsis .ellipsis-phantom { 
+	position:absolute; 
+}
+.ellipsis .ellipsis-phantom, .ellipsis .ellipsis-phantom * { 
+	color:transparent !important; 
+}
+
+.ellipsis window { 
+	width:100%;
+	-moz-user-focus:normal;
+	-moz-user-select:text;
+}
+
+.ellipsis description {
+	-moz-user-focus:normal;
+	-moz-user-select:text;
+}
+.classSec{
+	overflow: hidden; 
+	text-overflow: ellipsis; 
+	display: -webkit-box;
+	-webkit-line-clamp: 1; /* 라인수 */	
+	-webkit-box-orient: vertical; 
+	word-wrap:break-word;
+}
+.ellipsis2 {  }
+
+/* COLOR */
+.orange 	{ color:#f40; }
+.black 		{ color:#000000; }
+.darkGray 	{ color:#393939; }
+.dimGray 	{ color:#696969; }
+.gray 		{ color:#808080; }
+.rowGray 	{ color:#a9a9a9; }
+.silver 	{ color:#c0c0c0; }
+.lightGrey 	{ color:#d3d3d3; }
+.white 		{ color:#ffffff; }
+
+
+.float_l {	
+	float:left;
+}
+
+.float_r {	
+	float:right;
+	overflow:hidden;
+}
+
+.mr_r10 {
+	margin-right:10px; 
+}
+
+.clear {
+	clear:both;
+}
+
+.f_grey {
+	color:#c2c2c2;
+}
+
+.f_red {
+	color:#900023;
+}

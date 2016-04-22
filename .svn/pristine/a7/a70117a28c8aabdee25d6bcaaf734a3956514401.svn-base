@@ -1,0 +1,246 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.UserGoal;
+import kr.nomad.mars.dto.Userhb;
+import kr.nomad.util.T;
+
+public class UGoalDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+	
+	
+	
+
+	private RowMapper usergoalMapper = new RowMapper() {
+		public UserGoal mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserGoal usergoal = new UserGoal();
+			usergoal.setGoalSeq(rs.getInt("goal_seq"));
+			usergoal.setUserId(rs.getString("user_id"));
+			usergoal.setGoalsMblood(rs.getInt("goal_smblood"));
+			usergoal.setGoalbMblood(rs.getInt("goal_bmblood"));
+			usergoal.setGoalEblood(rs.getInt("goal_eblood"));
+			usergoal.setGoalSblood(rs.getInt("goal_sblood"));
+			usergoal.setGoalHba(rs.getFloat("goal_hba"));
+			usergoal.setGoalsPre(rs.getInt("goal_spre"));
+			usergoal.setGoalbPre(rs.getInt("goal_bpre"));
+			usergoal.setGoalPul(rs.getInt("goal_pul"));
+			usergoal.setGoalCol(rs.getInt("goal_col"));
+			usergoal.setGoalLdl(rs.getInt("goal_ldl"));
+			usergoal.setGoalHdl(rs.getInt("goal_hdl"));
+			usergoal.setGoalTg(rs.getInt("goal_tg"));
+			usergoal.setGoalsBmi(rs.getFloat("goal_sbmi"));
+			usergoal.setGoalbBmi(rs.getFloat("goal_bbmi"));
+			usergoal.setRegDate(rs.getString("reg_date"));
+			return usergoal;
+		}
+	};
+	
+/*	//관리목표받아옴
+	public UserGoal getGoal() {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_USER_GOAL " +
+				"WHERE user_id = 'admin' ";
+		return (UserGoal)this.jdbcTemplate.queryForObject(query, this.usergoalMapper);
+	}
+*/
+    //관리목표저장
+	public void addUserGoal(UserGoal usergoal) {
+		String query = "" +
+				"INSERT INTO T_NF_USER_GOAL " +
+				"	( user_id, goal_smblood, reg_date, goal_bmblood, goal_eblood, goal_sblood, goal_hba, goal_spre ,goal_bpre, goal_pul, goal_col, goal_ldl, goal_hdl, goal_tg, goal_sbmi, goal_bbmi) " +
+				"VALUES " +
+				"	(?, ?, getDate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		this.jdbcTemplate.update(query, new Object[] {
+			
+				usergoal.getUserId(),
+				usergoal.getGoalsMblood(),
+				usergoal.getGoalbMblood(),
+				usergoal.getGoalEblood(),
+				usergoal.getGoalSblood(),
+				usergoal.getGoalHba(),
+				usergoal.getGoalsPre(),
+				usergoal.getGoalbPre(),
+				usergoal.getGoalPul(),
+				usergoal.getGoalCol(),
+				usergoal.getGoalLdl(),
+				usergoal.getGoalHdl(),
+				usergoal.getGoalTg(),
+				usergoal.getGoalsBmi(),
+				usergoal.getGoalbBmi(),
+		
+		});
+	}
+	
+	//저장후
+	public UserGoal getuserGoal(String id) {
+		String query = "" + 
+				"SELECT top 1 * " +
+				"FROM T_NF_USER_GOAL " +
+				"WHERE user_id = ? order by reg_date desc";
+		try{
+			return (UserGoal)this.jdbcTemplate.queryForObject(query,  new Object[] { id },this.usergoalMapper);
+		}catch(Exception e){
+			return new UserGoal();
+		}
+	
+	}
+	
+	//해당아이디 데이터삭제
+	
+
+	public void deleteUserGoal(String id) {
+		String query = "DELETE FROM T_NF_USER_GOAL WHERE user_id = ? ";
+		try {
+				this.jdbcTemplate.update(query, new Object[] { id });
+		} catch (Exception e) {
+			
+		}
+	}
+	
+	
+	public void updateUserGoal(UserGoal usergoal) { 
+		String query = "" + 
+				"UPDATE T_NF_USER_GOAL SET " +
+				"	goal_smblood = ?, " +
+				"	goal_bmblood = ?, " +
+				"	goal_eblood = ?, " +
+				"	goal_sblood = ?, " +
+				"	goal_hba = ?, " +
+				"	goal_spre = ?, " +
+				"	goal_bpre = ?, " +
+				"	goal_pul = ?, " +
+				"	goal_col = ?, " +
+				"	goal_ldl = ?, " +
+				"	goal_hdl = ?, " +
+				"	goal_tg = ?, " +
+				"	goal_sbmi = ?, " +
+				"	goal_bbmi = ? " +
+				"WHERE user_id = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			usergoal.getGoalsMblood(),
+			usergoal.getGoalbMblood(),
+			usergoal.getGoalEblood(),
+			usergoal.getGoalSblood(),
+			usergoal.getGoalHba(),
+			usergoal.getGoalsPre(),
+			usergoal.getGoalbPre(),
+			usergoal.getGoalPul(),
+			usergoal.getGoalCol(),
+			usergoal.getGoalLdl(),
+			usergoal.getGoalHdl(),
+			usergoal.getGoalTg(),
+			usergoal.getGoalsBmi(),
+			usergoal.getGoalbBmi(),
+			usergoal.getUserId()
+		});
+	}
+
+
+
+	/*public void updateUserGoal(UserGoal usergoal) { 
+		String query = "" + 
+				"UPDATE T_NF_USER_GOAL SET " +
+				"	goal_seq = ?, " +
+				"	user_id = ?, " +
+				"	goal_mblood = ?, " +
+				"	goal_eblood = ?, " +
+				"	goal_sblood = ?, " +
+				"	goal_hba = ?, " +
+				"	goal_pre = ?, " +
+				"	goal_pul = ?, " +
+				"	goal_col = ?, " +
+				"	goal_ldl = ?, " +
+				"	goal_hdl = ?, " +
+				"	goal_tg = ?, " +
+				"	goal_bmi = ?, " +
+				"	reg_date = ? " +
+				"WHERE goal_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			usergoal.getGoalSeq(),
+			usergoal.getUserId(),
+			usergoal.getGoalMblood(),
+			usergoal.getGoalEblood(),
+			usergoal.getGoalSblood(),
+			usergoal.getGoalHba(),
+			usergoal.getGoalPre(),
+			usergoal.getGoalPul(),
+			usergoal.getGoalCol(),
+			usergoal.getGoalLdl(),
+			usergoal.getGoalHdl(),
+			usergoal.getGoalTg(),
+			usergoal.getGoalBmi(),
+			usergoal.getRegDate()
+		});
+	}
+
+	public UserGoal getUserGoal(String goal_seq) {
+		String query = "" + 
+				"SELECT goal_seq, user_id, goal_mblood, goal_eblood, goal_sblood, goal_hba, goal_pre, goal_pul, goal_col, goal_ldl, goal_hdl, goal_tg, goal_bmi, reg_date " +
+				"FROM T_NF_USER_GOAL " +
+				"WHERE goal_seq = ? ";
+		return (UserGoal)this.jdbcTemplate.queryForObject(query, new Object[] { goal_seq }, this.usergoalMapper);
+	}
+
+	public List<UserGoal> getUserGoalList(int page, int itemCountPerPage) {
+		String query = "" +
+				"SELECT TOP "+ itemCountPerPage +" goal_seq, user_id, goal_mblood, goal_eblood, goal_sblood, goal_hba, goal_pre, goal_pul, goal_col, goal_ldl, goal_hdl, goal_tg, goal_bmi, reg_date " +
+				"FROM T_NF_USER_GOAL " +
+				"WHERE goal_seq <= ( " +
+				"	SELECT MIN(goal_seq) " +
+				"	FROM ( " +
+				"		SELECT TOP "+ ((page-1) * itemCountPerPage + 1) +" goal_seq " +
+				"		FROM T_NF_USER_GOAL " +
+				"		ORDER BY goal_seq DESC " +
+				"	) AS A) " +
+				"ORDER BY goal_seq DESC";
+		return (List<UserGoal>)this.jdbcTemplate.query(query, this.usergoalMapper);
+	}*/
+	
+	//////// 관리자
+	
+	public List<UserGoal> getUserGoal(String user_id) {
+		String query = "" + 
+				"SELECT *  " +
+				"FROM T_NF_USER_GOAL " +
+				"WHERE user_id = ? ORDER BY reg_date DESC ";
+		return (List<UserGoal>)this.jdbcTemplate.query(query, new Object[] { user_id }, this.usergoalMapper);
+	}
+	
+	//기간갯수
+	public int getCount(String user_id) { 
+				String query = "" 
+						+ "SELECT count(*)  "
+						+"from T_NF_USER_GOAL where user_id = ?";
+			
+				
+			return this.jdbcTemplate.queryForInt(query, new Object[] { user_id });
+	}
+	
+	
+	//해당 아이디 최근데이터 하나만 가지고 오기
+	public UserGoal UserGoal(String userId) {
+		String query = "SELECT  TOP 1  * FROM T_NF_USER_GOAL WHERE user_id = ? ORDER BY reg_date desc";
+		
+		try {
+			return (UserGoal)this.jdbcTemplate.queryForObject(query, new Object[] { userId } ,this.usergoalMapper);
+		} catch (Exception e) {
+			 return new UserGoal();
+		}
+		
+	}	
+	
+
+}

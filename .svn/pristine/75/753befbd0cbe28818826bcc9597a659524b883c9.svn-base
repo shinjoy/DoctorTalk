@@ -1,0 +1,68 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Cperiod;
+import kr.nomad.mars.dto.Eperiod;
+import kr.nomad.mars.dto.UserCnt;
+import kr.nomad.util.T;
+
+public class EperiodDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper eperiodMapper = new RowMapper() {
+		public Eperiod mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Eperiod eperiod = new Eperiod();
+			eperiod.setEperSeq(rs.getInt("eper_seq"));
+			eperiod.setKcase(rs.getInt("kcase"));
+			eperiod.setSort(rs.getInt("sort"));
+			eperiod.setDiseaseId(rs.getString("disease_id"));
+			eperiod.setComment(rs.getString("comment"));
+			eperiod.setPseq(rs.getInt("pseq"));
+			eperiod.setAskind(rs.getInt("askind"));
+			eperiod.setMove(rs.getInt("move"));
+			eperiod.setValue(rs.getString("value"));
+			return eperiod;
+		}
+	};
+
+	
+	public List<Eperiod> getEperiod(int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_EPERIOD " +
+				"WHERE askind = 1 and kcase=? "+
+				"ORDER BY sort ASC";
+		return (List<Eperiod>)this.jdbcTemplate.query(query, new Object[] { kind }, this.eperiodMapper);
+	}
+	
+	public List<Eperiod> getEperiodAnswerList(int seq) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_EPERIOD " +
+				"WHERE askind = 2 and pseq = ? "+ 
+				"ORDER BY sort ASC ";
+		return (List<Eperiod>)this.jdbcTemplate.query(query, new Object[] { seq }, this.eperiodMapper);
+	}		
+	
+	public int getkcaseCount() {
+		String query = " select count(distinct(kcase)) from T_NF_DOCTOR_EPERIOD ";
+		return this.jdbcTemplate.queryForInt(query);
+	}
+	
+
+
+
+}

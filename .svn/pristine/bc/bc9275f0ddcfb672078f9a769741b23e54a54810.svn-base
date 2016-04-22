@@ -1,0 +1,64 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Day;
+import kr.nomad.mars.dto.Eperiod;
+import kr.nomad.mars.dto.UserCvrisk;
+import kr.nomad.util.T;
+
+
+public class DayDao {
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper dayMapper = new RowMapper() {
+		public Day mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Day day = new Day();
+			day.setDaySeq(rs.getInt("day_seq"));
+			day.setSort(rs.getInt("sort"));
+			day.setPseq(rs.getInt("pseq"));
+			day.setAskind(rs.getInt("askind"));
+			day.setComment(rs.getString("comment"));
+			day.setMove(rs.getInt("move"));
+			day.setAnsType(rs.getInt("ans_type"));
+			day.setDaygroup(rs.getString("daygroup"));
+			return day;
+		}
+	};
+	
+	public List<Day> getDaylist(String group) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_DAY " +
+				"WHERE askind = 1 and daygroup = ? "+
+				"ORDER BY sort ASC";
+		try{
+			return (List<Day>)this.jdbcTemplate.query(query, new Object[] { group }, this.dayMapper);
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
+	public List<Day> getDayAnswerList(int seq,String group) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_DAY " +
+				"WHERE askind = 2 and pseq = ? and daygroup = ?"+ 
+				"ORDER BY sort ASC ";
+		return (List<Day>)this.jdbcTemplate.query(query, new Object[] { seq,group }, this.dayMapper);
+	}			
+	
+	
+	
+}

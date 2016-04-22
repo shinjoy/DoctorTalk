@@ -1,0 +1,153 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Report;
+import kr.nomad.mars.dto.UserBlood;
+import kr.nomad.util.T;
+
+public class ReportDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper reportMapper = new RowMapper() {
+		public Report mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Report report = new Report();
+			report.setReportSeq(rs.getInt("report_seq"));
+			report.setSort(rs.getInt("sort"));
+			report.setPseq(rs.getInt("pseq"));
+			report.setComment(rs.getString("comment"));
+			report.setMove(rs.getInt("move"));
+			report.setKind(rs.getInt("kind"));
+			report.setAskind(rs.getInt("askind"));
+			report.setAnsType(rs.getInt("ans_type"));
+			report.setIsLast(rs.getInt("is_last"));
+			report.setQtype(rs.getString("qtype"));
+			report.setDiseaseId(rs.getString("disease_id"));
+			return report;
+		}
+	};
+
+	public void addReport(final Report report) {
+		String query = "" +
+				"INSERT INTO T_NF_DOCTOR_REPORT " +
+				"	(report_seq, sort, pseq, comment, move, kind, askind, ans_type, is_last) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			report.getReportSeq(),
+			report.getSort(),
+			report.getPseq(),
+			report.getComment(),
+			report.getMove(),
+			report.getKind(),
+			report.getAskind(),
+			report.getAnsType(),
+			report.getIsLast()
+		});
+	}
+
+	public void deleteReport(String report_seq) {
+		String query = "DELETE FROM T_NF_DOCTOR_REPORT WHERE report_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { report_seq });
+	}
+
+	public void updateReport(Report report) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_REPORT SET " +
+				"	report_seq = ?, " +
+				"	sort = ?, " +
+				"	pseq = ?, " +
+				"	comment = ?, " +
+				"	move = ?, " +
+				"	kind = ?, " +
+				"	askind = ?, " +
+				"	ans_type = ?, " +
+				"	is_last = ? " +
+				"WHERE report_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			report.getReportSeq(),
+			report.getSort(),
+			report.getPseq(),
+			report.getComment(),
+			report.getMove(),
+			report.getKind(),
+			report.getAskind(),
+			report.getAnsType(),
+			report.getIsLast()
+		});
+	}
+
+	public Report getReport(String report_seq) {
+		String query = "" + 
+				"SELECT report_seq, sort, pseq, comment, move, kind, askind, ans_type, is_last " +
+				"FROM T_NF_DOCTOR_REPORT " +
+				"WHERE report_seq = ? ";
+		return (Report)this.jdbcTemplate.queryForObject(query, new Object[] { report_seq }, this.reportMapper);
+	}
+	
+	//1주레포트 질문 리스트
+	public List<Report> getReportList(int kind,String diseseId) {
+		String query = "" +
+				"select * from T_NF_DOCTOR_REPORT where kind = ? and askind = 1 and disease_id = ? order by sort";
+		return (List<Report>)this.jdbcTemplate.query(query, new Object[] { kind, diseseId}, this.reportMapper);
+	}
+	//1주레포트 마지막 리스트
+	public List<Report> lastReportList() {
+		String query = "" +
+				"select * from T_NF_DOCTOR_REPORT where disease_id = 'common' and askind in (1,3) order by sort";
+		return (List<Report>)this.jdbcTemplate.query(query, this.reportMapper);
+	}
+	
+	//1주레포트 답변리스트
+	public List<Report> lastReportansList() {
+		String query = "" +
+				"select * from T_NF_DOCTOR_REPORT where disease_id = 'common' and askind =2 order by sort";
+		return (List<Report>)this.jdbcTemplate.query(query, this.reportMapper);
+	}
+
+	//1주(1개월)레포트 답변 리스트
+	public List<Report> getReportanswerList(int kind,int seq) {
+			String query = "" +
+					"select * from T_NF_DOCTOR_REPORT where kind = ? and askind = 2 and pseq = ? order by sort";
+			return (List<Report>)this.jdbcTemplate.query(query, new Object[] { kind, seq }, this.reportMapper);
+	}
+	
+	//1개월레포트 질문 리스트
+	public List<Report> getReportList(int kind) {
+		String query = "" +
+				"select * from T_NF_DOCTOR_REPORT where kind = ? and askind = 1 order by sort";
+		return (List<Report>)this.jdbcTemplate.query(query, new Object[] { kind}, this.reportMapper);
+	}
+	
+	
+
+	/*
+	public List<Report> getReportList(int page, int itemCountPerPage) {
+		String query = "" +
+				"SELECT TOP "+ itemCountPerPage +" report_seq, sort, pseq, comment, move, kind, askind, ans_type, is_last " +
+				"FROM T_NF_DOCTOR_REPORT " +
+				"WHERE report_seq <= ( " +
+				"	SELECT MIN(report_seq) " +
+				"	FROM ( " +
+				"		SELECT TOP "+ ((page-1) * itemCountPerPage + 1) +" report_seq " +
+				"		FROM T_NF_DOCTOR_REPORT " +
+				"		ORDER BY report_seq DESC " +
+				"	) AS A) " +
+				"ORDER BY report_seq DESC";
+		return (List<Report>)this.jdbcTemplate.query(query, this.reportMapper);
+	}
+	*/
+	
+
+}

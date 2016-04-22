@@ -1,0 +1,207 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Day;
+import kr.nomad.mars.dto.DayGroup;
+import kr.nomad.mars.dto.WeekGroup;
+
+
+public class DayDao {
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper dayMapper = new RowMapper() {
+		public Day mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Day day = new Day();
+			day.setDaySeq(rs.getInt("day_seq"));
+			day.setSort(rs.getInt("sort"));
+			day.setPseq(rs.getInt("pseq"));
+			day.setAskind(rs.getInt("askind"));
+			day.setComment(rs.getString("comment"));
+			day.setMove(rs.getInt("move"));
+			day.setAnsType(rs.getInt("ans_type"));
+			day.setDaygroup(rs.getInt("daygroup"));
+			day.setIsLast(rs.getInt("is_last"));
+			day.setGenderType(rs.getInt("gender_type"));
+			return day;
+		}
+	};
+	
+	private RowMapper dayMapper2 = new RowMapper() {
+		public Day mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Day day = new Day();
+		
+			day.setDaygroup(rs.getInt("daygroup"));
+			
+			return day;
+		}
+	};
+	
+	private RowMapper dayGroupMapper = new RowMapper() {
+		public DayGroup mapRow(ResultSet rs, int rowNum) throws SQLException {
+			DayGroup dayGroup = new DayGroup();
+			dayGroup.setDaygroup(rs.getInt("daygroup"));
+			dayGroup.setCount(rs.getInt("count"));
+			return dayGroup;
+		}
+	};
+	
+	
+	public List<Day> getDaylist(int group) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_DAY " +
+				"WHERE daygroup = ? "+
+				"ORDER BY sort ASC";
+		try{
+			return (List<Day>)this.jdbcTemplate.query(query, new Object[] { group }, this.dayMapper);
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
+	public List<Day> getDaylistTop1(int group) {
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_DOCTOR_DAY "
+				+ "	WHERE daygroup = ? "
+				+ "	ORDER BY sort ASC"
+				+ "	LIMIT 1 ";
+		try{
+			return (List<Day>)this.jdbcTemplate.query(query, new Object[] { group }, this.dayMapper);
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
+	public List<Day> getDayAnswerList(int seq,int group) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_DAY " +
+				"WHERE askind = 2 and pseq = ? and daygroup = ? "+ 
+				"ORDER BY sort ASC ";
+		return (List<Day>)this.jdbcTemplate.query(query, new Object[] { seq,group }, this.dayMapper);
+	}			
+	public int getGroupCount() {
+		String query = " select count(distinct(daygroup)) from T_NF_DOCTOR_DAY ";
+		return this.jdbcTemplate.queryForInt(query);
+	}
+	
+	
+	
+	//순서 업데이트
+	public void updatesort(int daySeq,int sort) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_DAY SET " +
+				
+				"	sort = ? " +
+			
+				"WHERE day_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {sort,daySeq});
+	}
+	
+	//업데이트
+	public void updateday(Day day) { 
+			String query = "" + 
+					"UPDATE T_NF_DOCTOR_DAY SET " +
+					" pseq =?,"+
+					" move = ?, "+
+					"	comment = ?, " +
+					"	ans_type = ? " +
+					"WHERE day_seq = ? ";
+			this.jdbcTemplate.update(query, new Object[] {
+					day.getPseq(),
+					day.getMove(),
+					day.getComment(),
+					day.getAnsType(),
+					day.getDaySeq()
+					});
+	}
+	
+	//islast
+	
+	public void updatelast(int seq,int num) { 
+			String query = "" + 
+					"UPDATE T_NF_DOCTOR_DAY SET " +
+					"	is_last = ? " +
+					"WHERE day_seq = ? ";
+			this.jdbcTemplate.update(query, new Object[] {
+					num,seq
+					});
+	}
+
+	public void deleteday(int Seq){
+		String query = "" + 
+				"DELETE FROM T_NF_DOCTOR_DAY WHERE day_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { Seq});
+	}
+	//그룹들
+	public List<Day> daygroup(){
+		String query = "" + 
+				"select DISTINCT(daygroup) from T_NF_DOCTOR_DAY order by daygroup asc";
+		return (List<Day>)this.jdbcTemplate.query(query,this.dayMapper2);
+	}
+	public List<DayGroup> dayGroup(){
+		String query = "" + 
+				"select daygroup, count(*) as count from T_NF_DOCTOR_DAY group by daygroup order by daygroup asc";
+		return (List<DayGroup>)this.jdbcTemplate.query(query,this.dayGroupMapper);
+	}
+	
+	public List<DayGroup> dayGroup(int page, int itemCountPerPage){
+		String query = ""  
+				+ "	SELECT * FROM ("
+				+ "		SELECT"
+				+ "			daygroup, count(*) as count "
+				+ "		FROM "
+				+ "			T_NF_DOCTOR_DAY "
+				+ "		group by daygroup "
+				+ "		ORDER BY daygroup asc "
+				+ ") AS a LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+		return (List<DayGroup>)this.jdbcTemplate.query(query, this.dayGroupMapper);
+	}
+
+	public int dayGroupCount(){
+		String query = "select count(distinct(daygroup)) from T_NF_DOCTOR_DAY ";
+		return this.jdbcTemplate.queryForInt(query);
+	}
+	
+	//추가
+	public void addcontent(Day day) {
+		String query = "" +
+				"INSERT INTO T_NF_DOCTOR_DAY " +
+				"	(sort, pseq, askind, comment, move, ans_type, daygroup, is_last, gender_type) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			day.getSort(),
+			day.getPseq(),
+			day.getAskind(),
+			day.getComment(),
+			day.getMove(),
+			day.getAnsType(),
+			day.getDaygroup(),
+			day.getIsLast(),
+			day.getGenderType()
+		});
+	}
+	
+	public int getLastId() {
+	    String query = "SELECT max(daygroup) FROM T_NF_DOCTOR_DAY; ";
+	    return this.jdbcTemplate.queryForInt(query );
+	}
+	
+
+	
+	
+}

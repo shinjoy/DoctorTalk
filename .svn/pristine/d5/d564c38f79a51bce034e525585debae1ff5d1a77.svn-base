@@ -1,0 +1,18 @@
+# config.properties
+mssql.driverClassName = net.sourceforge.jtds.jdbc.Driver
+
+#mssql.url = jdbc:jtds:sqlserver://1.226.83.85:1433;tds=8.0;lastupdatecount=true;DatabaseName=GONGAM_AD
+#mssql.username = gonggamad0_1
+#mssql.password = ms37993790
+
+mssql.url = jdbc:jtds:sqlserver://218.234.17.222:1433;tds=8.0;lastupdatecount=true;DatabaseName=DOCTOR_TALK
+mssql.username = mars
+mssql.password = shak05em03
+
+file.maxSize = 100000000
+file.root = C:/WorkSpace/FILES/Recover
+
+page.itemCountPerPage = 10
+page.pageCountPerPaging = 10
+
+scheduler.turn = off

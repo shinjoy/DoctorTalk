@@ -1,0 +1,93 @@
+package kr.nomad.mars.dto;
+
+public class UserPress {
+	
+	int preSeq = 0;
+	String userId = "";
+	int pulse = 0;
+	int splessure = 0;
+	int dplessure = 0;
+	String regDate = "";
+	String date = "";
+	int equip =0;
+	
+	String equipText = "";
+	String comment="";
+	
+	
+	
+	
+	public String getComment() {
+		return comment;
+	}
+
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	public static int EQUIP_NON = 0; // 장비 사용안함
+	public static int EQUIP_USE = 1; // 장비 사용
+	
+	public String getEquipText() {
+		if (this.equip == EQUIP_NON) {
+			return "장비 사용안함";
+		} else if (this.equip == EQUIP_USE) {
+			return "장비 사용";
+		} else {
+			return "";
+		}
+	}
+	
+	
+	public int getPreSeq() {
+		return preSeq;
+	}
+	public void setPreSeq(int preSeq) {
+		this.preSeq = preSeq;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public int getPulse() {
+		return pulse;
+	}
+	public void setPulse(int pulse) {
+		this.pulse = pulse;
+	}
+	public int getSplessure() {
+		return splessure;
+	}
+	public void setSplessure(int splessure) {
+		this.splessure = splessure;
+	}
+	public int getDplessure() {
+		return dplessure;
+	}
+	public void setDplessure(int dplessure) {
+		this.dplessure = dplessure;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+	public String getDate() {
+		if(regDate.length()>8){
+			return regDate.substring(5,10).replace("-", ".");
+		}else{
+			return regDate.substring(5,7);
+		}
+	}
+	public int getEquip() {
+		return equip;
+	}
+	public void setEquip(int equip) {
+		this.equip = equip;
+	}
+	
+
+}

@@ -1,0 +1,45 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ include file="/WEB-INF/views/common/header5.jsp"  %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<style>
+.maga td { padding:3px;} 
+</style>
+
+<html>
+
+<head>
+
+</head>
+
+<body class="mobile">
+
+<ul class="magazine-list">
+	<c:set var="i" value="1"></c:set>
+	<c:forEach items="${list}" var="it">
+		<li class="preview-cell" onclick="document.location.href='/m/maga_view.go?mSeq=${it.mSeq}';">
+			<div class="photo-magazine" style="background-image:url('/files/magazine/thumb/${it.fileName}')"></div>
+			<ul class="contents">
+				<li class="bullet ${i==1?'green':i==2?'yellow':i==3?'purple':''}"></li>
+				<li class="contents">
+					<div class="subtitle">${it.subTitle}</div>
+					<div class="title">
+						<% pageContext.setAttribute("LF", "\n"); %>
+						${fn:replace(it.title, LF,'<br>')}
+					</div>
+					<div class="month">${it.month}</div>
+				</li>
+				<!-- 
+				<li class="arrow">
+					<div class="magazine-arrow"><img src="/images/arrow_list_right.png"></div>
+				</li>
+				 -->
+			</ul>
+		</li>
+		<c:set var="i" value="${i+1}"></c:set>
+	</c:forEach>
+</ul>
+</body>
+</html>

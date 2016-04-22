@@ -1,0 +1,40 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header5.jsp"  %>
+	
+<script type="text/javascript">
+$(document).ready(function() {
+
+});
+
+//채팅화면 오픈 요청
+function openChat(id) {
+	window.location = "jscall://callChatRoom?"+id;
+}
+
+</script>
+
+</head>
+
+<body>
+
+	<ul>
+		<c:forEach var="it" items="${list}">
+			<li onclick="openChat('${USER_ID}')">
+				<table class="chat-list">
+				<tr>
+					<td class="photo-cell"><div class="profile" style="background-image:url('${it.fileName=='' ? '/images/user_default.png' : it.fileName}');"></div></td>
+					<td class="underline">
+						<span class="bold">${it.userName}</span> (${it.genderText} | ${it.userAge}세)<br>
+						<span class="gray">${it.blood==1 ? '혈당' : '' } ${it.press==1 ? '혈압' : '' } ${it.col==1 ? '콜레스테롤' : '' } ${it.heiwieght==1 ? '체중' : '' }</span><br>
+						<img src="/images/icon_clock.png" style="vertical-align:middle;"> ${it.counselDate } ${it.counselTime }
+					</td>
+				</tr>
+				</table>
+			</li>
+		</c:forEach>
+	</ul>
+
+</body>
+
+</html>

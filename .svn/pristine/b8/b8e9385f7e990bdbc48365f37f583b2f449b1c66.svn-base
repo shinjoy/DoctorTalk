@@ -1,0 +1,96 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import kr.nomad.mars.dto.Confg;
+import kr.nomad.mars.dto.Config;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+public class ConfigDao {
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper configMapper = new RowMapper() {
+		public Config mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Config config = new Config();
+			config.setAppSeq(rs.getInt("app_seq"));
+			config.setAppVersion(rs.getString("app_version"));
+			return config;
+		}
+	};
+
+	public void addConfig(final Config config) {
+		String query = "" +
+				"INSERT INTO T_NF_CONFIG " +
+				"	(app_version) " +
+				"VALUES " +
+				"	(?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			config.getAppVersion()
+		});
+	}
+
+	public void deleteConfig(int app_seq) {
+		String query = "DELETE FROM T_NF_CONFIG WHERE app_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { app_seq });
+	}
+
+	public void updateConfig(Config config) { 
+		String query = "" + 
+				"UPDATE T_NF_CONFIG SET " +
+				"	app_version = ? " +
+				"WHERE app_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			config.getAppVersion(),
+			config.getAppSeq()
+		});
+	}
+
+	public Config getConfig() {
+		String query = "" + 
+				"SELECT app_seq, app_version " +
+				"FROM T_NF_CONFIG ";
+		return (Config)this.jdbcTemplate.queryForObject(query, this.configMapper);
+	}
+	public Config getConfig(int app_seq ) {
+		String query = "" + 
+				"SELECT app_seq, app_version " +
+				"FROM T_NF_CONFIG WHERE app_seq = ?";
+		return (Config)this.jdbcTemplate.queryForObject(query,new Object[] { app_seq }, this.configMapper);
+	}
+	
+	
+	public List<Config> getConfigList(int page, int itemCountPerPage) {
+		
+		List<Config> result = null;
+
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "	SELECT "
+				+ "		ROW_NUMBER() OVER(ORDER BY app_seq desc ) AS row_seq, "
+				+ "		* "
+				+ "	FROM T_NF_CONFIG"
+				+ ") AS row WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") + 1 AND "+page+" * "+itemCountPerPage+" ";
+				
+		result = (List<Config>)this.jdbcTemplate.query(query,new Object[] {}, this.configMapper);
+		
+		return result;
+	}
+
+	public int getCount() {
+		int result = 0;		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_CONFIG";
+		result = this.jdbcTemplate.queryForInt(query,new Object[] {});
+				
+		return result;
+	}
+
+}

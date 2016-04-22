@@ -1,0 +1,137 @@
+package kr.nomad.mars.dto;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MedExam {
+	
+	int medSeq = 0;
+	int sort = 0;
+	String comment = "";
+	String value = "";
+	int askind = 0;
+	int pseq = 0;
+	int move = 0;
+	int ansType =0;
+	int kind = 0;
+	String qtype = "";
+	int isLast = 0;
+	String askText = "";
+	String valueText = "";
+	List answerList = new ArrayList();
+
+	
+	public static int ASK_INFO = 1; // 질문
+	public static int ASK_QUESTION = 2; // 답변
+	//public static int ASK_ANSWER = 3; // 안내글
+	
+	public static int VALUE_INPUT = 0; // 입력
+	public static int VALUE_SELECT = 1; // 선택
+	
+	public String getAskText() {
+
+		if (this.askind == ASK_INFO) {
+			return "질문";
+		} else if (this.askind == ASK_QUESTION) {
+			return "답변";
+		} 
+//		else if (this.askind == ASK_ANSWER) {
+//			return "답변";
+//		} 
+		else {
+			return "";
+		}
+	}
+	
+	public String getValueText() {
+
+		if (this.ansType == VALUE_INPUT) {
+			return "입력";
+		} else if (this.ansType == VALUE_SELECT) {
+			return "선택";
+		}else{
+			return "";
+		}
+	}
+	
+	
+	
+	public String getQtype() {
+		return qtype;
+	}
+	public void setQtype(String qtype) {
+		this.qtype = qtype;
+	}
+	public int getKind() {
+		return kind;
+	}
+	public void setKind(int kind) {
+		this.kind = kind;
+	}
+	public int getMedSeq() {
+		return medSeq;
+	}
+	public void setMedSeq(int medSeq) {
+		this.medSeq = medSeq;
+	}
+	public int getSort() {
+		return sort;
+	}
+	public void setSort(int sort) {
+		this.sort = sort;
+	}
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
+	}
+	
+	
+	
+	public int getAskind() {
+		return askind;
+	}
+
+	public void setAskind(int askind) {
+		this.askind = askind;
+	}
+
+	public int getPseq() {
+		return pseq;
+	}
+	public void setPseq(int pseq) {
+		this.pseq = pseq;
+	}
+	public int getMove() {
+		return move;
+	}
+	public void setMove(int move) {
+		this.move = move;
+	}
+	public int getAnsType() {
+		return ansType;
+	}
+	public void setAnsType(int ansType) {
+		this.ansType = ansType;
+	}
+	public List getAnswerList() {
+		return answerList;
+	}
+	public void setAnswerList(List answerList) {
+		this.answerList = answerList;
+	}
+	public int getIsLast() {
+		return isLast;
+	}
+	public void setIsLast(int isLast) {
+		this.isLast = isLast;
+	}
+}

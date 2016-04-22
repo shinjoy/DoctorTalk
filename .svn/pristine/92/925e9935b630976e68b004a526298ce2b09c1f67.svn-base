@@ -1,0 +1,143 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header.jsp"  %>
+
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+ 		aside.setActive(4,2);
+		searchList(listForm,1);
+	});
+
+	function searchList(listForm,page) {
+		var param = {
+			keyword		: 	listForm.keyword.value,
+			page		:	page
+		};
+		
+		$.ajax({
+			type:"POST",
+			url:"/admin/doctor_index_input/pressure_list.go",
+			dataType:"html",
+			data:param,
+			success:function(msg){
+				$("#contents-list").html(msg);
+			}
+		});
+		return false;
+	}
+	
+
+	
+
+	function popAnalysistAdd(userId) {
+		pop.openPage("/admin/member/analyst_edit.go?userId="+userId);
+	}
+</script>
+
+</head>
+<body>
+
+<%@ include file="/WEB-INF/views/admin/admin_header.jsp"  %>
+
+<section class="main-cover main-row">
+	<section id="main">
+		
+		<%@ include file="/WEB-INF/views/admin/admin_menu.jsp"  %>
+
+		<section id="contents">
+			<header class="panel">
+				 ■ 홈 > 닥터톡 - 지표입력 > 혈압
+			</header>
+		
+			<div class="contents-block">
+			
+				<h1>혈압</h1>
+				
+				<div class="contents-main">
+				
+					<form method="post" name="listForm" id="listForm" onsubmit="return searchList(this,1); return false;">
+						<div class="contents-top">
+							<div class="top-tools">
+								<div class="search-tool">
+									<input type="text" name="keyword" value="${keyword}" placeholder="제목/내용 검색" class="itext">
+									<button type="submit" class="btn" >검색</button>
+								</div>
+							</div>
+						</div>
+						
+						<div id="contents-list">
+						</div>
+						
+						<div style="margin-top:20px; ">
+							<h2>추가하기</h2>
+							<table class="list" style="border:1px solid #ddd;">
+								<tbody>
+									<td> 
+										<select>
+											<option value="0">안내문</option>
+											<option value="1">답안</option>
+											<option value="2">20대</option>	
+											<option value="3">30대</option>
+											<option value="4">40대</option>	
+											<option value="5">50대이상</option>	
+										</select> 
+										<select>
+											<option value="0">안내문</option>
+											<option value="1">답안</option>
+											<option value="2">20대</option>	
+											<option value="3">30대</option>
+											<option value="4">40대</option>	
+											<option value="5">50대이상</option>	
+										</select> 
+									</td>
+									<td>  <input type="text" class="itext"> </td>
+									<td> <button class="btn">등록</button>  </td>
+								</tbody>
+							
+							</table>		
+						</div>
+							
+							
+						<div style="margin-top:20px;">
+							<h2>추가하기</h2>
+							<table class="list" style="border:1px solid #ddd;">
+								<tbody>
+									<td> 
+										<select>
+											<option value="0">안내문</option>
+											<option value="1">답안</option>
+											<option value="2">20대</option>	
+											<option value="3">30대</option>
+											<option value="4">40대</option>	
+											<option value="5">50대이상</option>	
+										</select> 
+										<select>
+											<option value="0">안내문</option>
+											<option value="1">답안</option>
+											<option value="2">20대</option>	
+											<option value="3">30대</option>
+											<option value="4">40대</option>	
+											<option value="5">50대이상</option>	
+										</select> 
+										 <input type="text" class="itext"> 
+									</td>
+									<td> </td>
+									<td>  goto<input type="text" class="itext"> </td>
+									<td> <button class="btn">등록</button>  </td>
+								</tbody>
+							</table>		
+						</div>	
+					</form>
+					
+				</div>
+			</div>
+		</section>
+	</section>
+</section>
+
+<%@ include file="/WEB-INF/views/admin/admin_footer.jsp"  %>
+
+</body>
+</html>

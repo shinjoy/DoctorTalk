@@ -1,0 +1,246 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Notice;
+
+public class NoticeDao {
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper noticeMapper = new RowMapper() {
+		public Notice mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Notice notice = new Notice();
+			notice.setNoticeSeq(rs.getInt("notice_seq"));
+			notice.setUserId(rs.getString("user_id"));
+			notice.setNotiType(rs.getString("noti_type"));
+			notice.setSendPush(rs.getInt("send_push"));
+			notice.setTitle(rs.getString("title"));
+			notice.setContentsHtml(rs.getString("contents_html"));
+			notice.setContentsText(rs.getString("contents_text"));
+			notice.setLinkUrl(rs.getString("link_url"));
+			notice.setStartDate(rs.getString("start_date"));
+			notice.setEndDate(rs.getString("end_date"));
+			notice.setVisible(rs.getInt("visible"));
+			notice.setFiles(rs.getString("files"));
+			notice.setViewCount(rs.getInt("view_count"));
+			notice.setRegDate(rs.getString("reg_date"));
+			return notice;
+		}
+	};
+
+	public void addNotice(final Notice notice) {
+		String query = "" +
+				"INSERT INTO T_NF_NOTICE " +
+				"	(user_id, noti_type, send_push, title, contents_html, contents_text, link_url, start_date, end_date, visible, files, view_count, reg_date) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getDate()) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			notice.getUserId(),
+			notice.getNotiType(),
+			notice.getSendPush(),
+			notice.getTitle(),
+			notice.getContentsHtml(),
+			notice.getContentsText(),
+			notice.getLinkUrl(),
+			notice.getStartDate(),
+			notice.getEndDate(),
+			notice.getVisible(),
+			notice.getFiles(),
+			notice.getViewCount()
+		});
+	}
+
+	public void deleteNotice(int notice_seq) {
+		String query = "DELETE FROM T_NF_NOTICE WHERE notice_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { notice_seq });
+	}
+
+	public void updateNotice(Notice notice) { 
+		String query = "" + 
+				"UPDATE T_NF_NOTICE SET " +
+				"	user_id = ?, " +
+				"	noti_type = ?, " +
+				"	send_push = ?, " +
+				"	title = ?, " +
+				"	contents_html = ?, " +
+				"	contents_text = ?, " +
+				"	link_url = ?, " +
+				"	start_date = ?, " +
+				"	end_date = ?, " +
+				"	visible = ?, " +
+				"	files = ?, " +
+				"	view_count = ?, " +
+				"	reg_date = getDate() " +
+				"WHERE notice_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			notice.getUserId(),
+			notice.getNotiType(),
+			notice.getSendPush(),
+			notice.getTitle(),
+			notice.getContentsHtml(),
+			notice.getContentsText(),
+			notice.getLinkUrl(),
+			notice.getStartDate(),
+			notice.getEndDate(),
+			notice.getVisible(),
+			notice.getFiles(),
+			notice.getViewCount(),
+			notice.getNoticeSeq()
+		});
+	}
+
+	public Notice getNotice(int notice_seq) {
+		String query = "" + 
+				" SELECT notice_seq, user_id, noti_type, send_push, title, contents_html, contents_text, link_url, start_date, end_date, visible, files, view_count, reg_date " +
+				" FROM T_NF_NOTICE " +
+				" WHERE notice_seq = ? ";
+		return (Notice)this.jdbcTemplate.queryForObject(query, new Object[] { notice_seq }, this.noticeMapper);
+	}
+
+	
+	// 공지사항 리스트 
+	
+	public List<Notice> getNoticeMainList(int page, int itemCountPerPage) {
+		
+		List<Notice> result = null;
+
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "	SELECT "
+				+ "		ROW_NUMBER() OVER(ORDER BY notice_seq desc ) AS row_seq, "
+				+ "		* "
+				+ "	FROM T_NF_NOTICE "
+				+ ") AS row WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") + 1 AND "+page+" * "+itemCountPerPage+" ";
+				
+		result = (List<Notice>)this.jdbcTemplate.query(query, this.noticeMapper);
+		
+		return result;
+	}
+	
+	
+	public int getNoticeMainCount() {
+		int result = 0;		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_NOTICE ";
+		result = this.jdbcTemplate.queryForInt(query);
+				
+		return result;
+	}
+	
+	// 공지사항 키워드 검색
+	
+	public List<Notice> getNoticeMainList(String keyword, int page, int itemCountPerPage) {
+		String query = ""
+				+ "    SELECT * FROM ( "
+				+ "        SELECT "
+				+ "            ROW_NUMBER() OVER(ORDER BY notice_seq DESC) as row_seq, "
+				+ "            * "
+				+ "        FROM T_NF_NOTICE "
+				+ "        WHERE (title like ? OR contents_text like ? ) "
+				+ "    ) AS a WHERE row_seq BETWEEN ((" + page + " - 1) * "
+				+ itemCountPerPage + ") +1 AND " + page + " * "
+				+ itemCountPerPage + " ";
+		return (List<Notice>) this.jdbcTemplate.query(query,new Object[] {"%" + keyword + "%","%" + keyword + "%"}, this.noticeMapper);
+	}
+
+	public int getNoticeMainCount(String keyword) {
+		String query = " SELECT COUNT(*) FROM T_NF_NOTICE WHERE (noti_type = ? AND title like ? OR contents_text like ? ) ";
+		return this.jdbcTemplate.queryForInt(query, new Object[] {"%"+ keyword+"%","%" + keyword + "%"});
+	}
+	
+	
+	
+	// 메인 팝업공지사항
+	
+	public List<Notice> getNoticeTopList() {
+		
+		List<Notice> result = null;
+		String query = ""
+				+ "	SELECT top  * "
+				+ "	FROM T_NF_NOTICE WHERE noti_type = 10 "
+				+ " ORDER BY notice_seq desc ";
+		result = (List<Notice>)this.jdbcTemplate.query(query, this.noticeMapper);
+		return result;
+	}
+	
+	
+	
+	// 팝업공지 리스트 
+	
+	public List<Notice> getNoticeMainList(int page, int itemCountPerPage,int notiType) {
+		
+		List<Notice> result = null;
+
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "	SELECT "
+				+ "		ROW_NUMBER() OVER(ORDER BY notice_seq desc ) AS row_seq, "
+				+ "		* "
+				+ "	FROM T_NF_NOTICE "
+				+ ") AS row WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") + 1 AND "+page+" * "+itemCountPerPage+" ";
+				
+		result = (List<Notice>)this.jdbcTemplate.query(query,new Object[] {notiType}, this.noticeMapper);
+		
+		return result;
+	}
+	
+	
+	public int getNoticeMainCount(int notiType) {
+		int result = 0;		
+		String query = "SELECT COUNT(*) AS cnt FROM T_NF_NOTICE ";
+		result = this.jdbcTemplate.queryForInt(query,new Object[] {notiType});
+				
+		return result;
+	}
+
+	
+	
+	// 공지사항 키워드 검색
+	
+	public List<Notice> getNoticeMainList(String keyword, int page, int itemCountPerPage,int notiType) {
+		String query = ""
+				+ "    SELECT * FROM ( "
+				+ "        SELECT "
+				+ "            ROW_NUMBER() OVER(ORDER BY notice_seq DESC) as row_seq, "
+				+ "            * "
+				+ "        FROM T_NF_NOTICE "
+				+ "        WHERE (noti_type = ? AND title like ? OR contents_text like ? ) "
+				+ "    ) AS a WHERE row_seq BETWEEN ((" + page + " - 1) * "
+				+ itemCountPerPage + ") +1 AND " + page + " * "
+				+ itemCountPerPage + " ";
+		return (List<Notice>) this.jdbcTemplate.query(query,new Object[] {notiType,"%" + keyword + "%","%" + keyword + "%"}, this.noticeMapper);
+	}
+
+	public int getNoticeMainCount(String keyword,int notiType) {
+		String query = " SELECT COUNT(*) FROM T_NF_NOTICE WHERE (noti_type = ? AND title like ? OR contents_text like ? ) ";
+		return this.jdbcTemplate.queryForInt(query, new Object[] {notiType,"%"+ keyword+"%","%" + keyword + "%"});
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public int getLastSeq() {
+		String query = " SELECT MAX(notice_seq) FROM T_NF_NOTICE ";
+		return this.jdbcTemplate.queryForInt(query);
+	}
+	
+	
+	
+	
+}

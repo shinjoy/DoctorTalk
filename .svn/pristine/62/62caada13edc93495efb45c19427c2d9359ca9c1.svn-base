@@ -1,0 +1,307 @@
+package kr.nomad.mars;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import kr.nomad.mars.dao.MagazineDao;
+import kr.nomad.mars.dao.MagazinePageDao;
+import kr.nomad.mars.dao.NoticeDao;
+import kr.nomad.mars.dao.QnaDao;
+import kr.nomad.mars.dto.Magazine;
+import kr.nomad.mars.dto.MagazinePage;
+import kr.nomad.mars.dto.Notice;
+import kr.nomad.mars.dto.Qna;
+import kr.nomad.util.Paging;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+public class MobileController {
+
+	@Autowired
+	NoticeDao noticeDao;
+
+	@Autowired
+	QnaDao qnaDao;
+	
+	@Autowired MagazineDao magazineDao;
+	@Autowired MagazinePageDao magazinepageDao;
+
+	// 페이지당 아이템 갯수
+	@Value("#{config['page.itemCountPerPage']}")
+	int ITEM_COUNT_PER_PAGE;
+
+	// 페이징당 페이지 갯수
+	@Value("#{config['page.pageCountPerPaging']}")
+	int PAGE_COUNT_PER_PAGING;
+
+	// 파일 루트
+	@Value("#{config['file.root']}")
+	String FILE_ROOT;
+
+	String FILE_PATH = "";
+	String FILE_LOCAL_PATH = "";
+
+	// 파일 최대크기(Mb)
+	@Value("#{config['file.maxSize']}")
+	int FILE_MAX_SIZE;
+
+	// 이용약관
+	@RequestMapping("/m/terms_use.go")
+	public String mTermsUseController(
+			@RequestParam(value = "seq", required = false, defaultValue = "0") int seq,
+			HttpSession session, Model model) {
+
+		return "/m/terms_use";
+	}
+
+	// 운영정책
+	@RequestMapping("/m/terms_rule.go")
+	public String mTermsRuleController(
+			@RequestParam(value = "seq", required = false, defaultValue = "0") int seq,
+			HttpSession session, Model model) {
+
+		return "/m/terms_rule";
+	}
+
+	// 개인정보보호정책
+	@RequestMapping("/m/terms_personal.go")
+	public String mTermsPersonalController(
+			@RequestParam(value = "seq", required = false, defaultValue = "0") int seq,
+			HttpSession session, Model model) {
+
+		return "/m/terms_personal";
+	}
+	
+	/********************************************************************************
+	 * 공지사항 공지
+	 * 
+	 * @param seq
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/m/notice/notice.go")
+	public String mNoticeController(
+			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+			@RequestParam(value = "ctrl", required = false, defaultValue = "0") int ctrl,
+			HttpSession session, Model model) {
+		// User loginUser =
+		// userDao.getUser(session.getAttribute("USER_ID").toString());
+
+		// model.addAttribute("loginUser", loginUser);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("ctrl", ctrl);
+		return "m/notice/notice";
+	}
+
+	@RequestMapping("/m/notice/notice_list.go")
+	public String mNoticeListController(
+			@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+			@RequestParam(value = "ctrl", required = false, defaultValue = "0") int ctrl,
+			HttpSession session, Model model) {
+
+		List<Notice> list = null;
+		int count = 0;
+		int notiType = 0;
+
+		if (keyword.equals("")) {
+
+			list = noticeDao.getNoticeMainList(page, ITEM_COUNT_PER_PAGE,notiType);
+			count = noticeDao.getNoticeMainCount(notiType);
+
+		} else {
+
+			list = noticeDao.getNoticeMainList(keyword, page,ITEM_COUNT_PER_PAGE,notiType);
+			count = noticeDao.getNoticeMainCount(keyword,notiType);
+
+		}
+
+		// 페이징
+		String paging = Paging.getPaging2(page, count, ITEM_COUNT_PER_PAGE,PAGE_COUNT_PER_PAGING);
+
+		model.addAttribute("list", list);
+		model.addAttribute("paging", paging);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("currentPage", page);
+		return "m/notice/notice_list";
+	}
+
+	// 공지사항 상세보기 페이지
+	@RequestMapping("/m/notice/notice_view.go")
+	public String mNoticeViewController(
+			@RequestParam(value = "seq", required = false, defaultValue = "0") int seq,
+			HttpSession session, Model model) {
+
+		Notice notice = null;
+		if (seq == 0) {
+			notice = new Notice();
+		} else {
+			notice = noticeDao.getNotice(seq);
+		}
+
+		// model.addAttribute("loginUser", loginUser);
+		model.addAttribute("notice", notice);
+		return "m/notice/notice_view";
+	}
+
+	/********************************************************************************
+	 * QNA 공지
+	 * 
+	 * @param seq
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/m/faq/faq.go")
+	public String mQnaController(
+			HttpSession session, Model model) {
+		return "m/faq/faq";
+	}
+	@RequestMapping("/m/faq/faq_items.go")
+	public String mFaqItemsController(
+			@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(value = "category", required = false, defaultValue = "0") int category,
+			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+			@RequestParam(value = "ctrl", required = false, defaultValue = "0") int ctrl,
+			
+			HttpSession session, Model model) {
+		// User loginUser =
+		// userDao.getUser(session.getAttribute("USER_ID").toString());
+
+		// model.addAttribute("loginUser", loginUser);
+		
+		model.addAttribute("ctrl", ctrl);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("category", category);
+		model.addAttribute("keyword", keyword);
+		return "m/faq/faq_items";
+	}
+
+	@RequestMapping("/m/faq/faq_list.go")
+	public String mQnaListController(
+			@RequestParam(value = "category", required = false, defaultValue = "0") int category,
+			@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+			@RequestParam(value = "ctrl", required = false, defaultValue = "0") int ctrl,
+			@RequestParam(value = "seq", required = false, defaultValue = "0") int seq,
+			HttpSession session, Model model) {
+
+		List<Qna> list = null;
+		int count = 0;
+	
+		Qna qna = null;
+		if (seq ==  0) {
+			qna = new Qna();
+		} else {
+			qna = qnaDao.getQna(seq);
+		}
+		
+		if (keyword.equals("")) {
+
+			list = qnaDao.getQnaList(page, ITEM_COUNT_PER_PAGE,category);
+			count = qnaDao.getCount(category);
+
+		} else {
+
+			list = qnaDao.getQnaList(keyword, page, ITEM_COUNT_PER_PAGE,category);
+			count = qnaDao.getCount(keyword,category);
+
+		}
+
+		// 페이징
+		String paging = Paging.getPaging2(page, count, ITEM_COUNT_PER_PAGE,PAGE_COUNT_PER_PAGING);
+		
+		
+		
+
+		model.addAttribute("list", list);
+		model.addAttribute("paging", paging);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("category", category);
+		
+		return "/m/faq/faq_list";
+	}
+
+	// Qna 공지 상세보기 페이지
+	@RequestMapping("/m/faq/faq_view.go")
+	public String mQnaViewController(
+			@RequestParam(value = "category", required = false, defaultValue = "0") int category,
+			@RequestParam(value = "seq", required = false, defaultValue = "0") int seq,
+			@RequestParam(value = "ctrl", required = false, defaultValue = "0") int ctrl,
+			HttpSession session, Model model) {
+
+		Qna qna = null;
+		if (seq ==  0) {
+			qna = new Qna();
+		} else {
+			qna = qnaDao.getQna(seq);
+		}
+
+		// model.addAttribute("loginUser", loginUser);
+		model.addAttribute("category", category);
+		model.addAttribute("qna", qna);
+		model.addAttribute("ctrl", ctrl);
+		return "m/faq/faq_view";
+	}
+	
+	//매거진 메인페이지
+	@RequestMapping("/m/maga_list.go")
+	public String MainController(
+			HttpSession session, Model model
+			) {
+
+		Map<String, Object> map = new HashMap();
+
+		List<Magazine>list = magazineDao.getMagazineList();
+		
+		model.addAttribute("list", list);
+		
+		return "/m/magazine/maga_list";
+	}
+	
+	//매거진 보기
+	@RequestMapping("/m/maga_view.go")
+	public String viewController(
+			@RequestParam(value = "mSeq", required = false, defaultValue = "0") int mSeq,
+			HttpSession session, Model model
+			) {
+		Map<String, Object>map = new HashMap();
+		
+		Magazine top = magazineDao.getMagazine(mSeq);
+		
+		List<MagazinePage>list = magazinepageDao.getMagazinePageList(mSeq);
+
+		
+		model.addAttribute("top", top);
+		model.addAttribute("sub", list);
+		
+		return "/m/magazine/maga_view";
+	}
+
+	//매거진 서브 보기
+	@RequestMapping("/m/maga_subview.go")
+	public String subviewController(
+			@RequestParam(value = "pSeq", required = false, defaultValue = "0") int pSeq,
+			HttpSession session, Model model
+			) {
+		Map<String, Object>map = new HashMap();
+		
+		MagazinePage sub = magazinepageDao.getMagaginePage(pSeq);
+		
+		List<MagazinePage>list = magazinepageDao.getMagazinePageSubList(pSeq);
+		
+		model.addAttribute("sub", sub);
+		model.addAttribute("list", list);
+		return "/m/magazine/maga_subview";
+	}
+	
+}

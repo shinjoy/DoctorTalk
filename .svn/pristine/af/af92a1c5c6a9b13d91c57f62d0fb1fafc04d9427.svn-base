@@ -1,0 +1,123 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.DoctorMagagine;
+import kr.nomad.util.T;
+
+public class MagagineDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper doctormagagineMapper = new RowMapper() {
+		public DoctorMagagine mapRow(ResultSet rs, int rowNum) throws SQLException {
+			DoctorMagagine doctormagagine = new DoctorMagagine();
+			doctormagagine.setMagaSeq(rs.getInt("maga_seq"));
+			doctormagagine.setCotents(rs.getString("cotents"));
+			doctormagagine.setMonth(rs.getString("month"));
+			doctormagagine.setTitle(rs.getString("title"));
+			doctormagagine.setFileName(rs.getString("file_name"));
+			doctormagagine.setPseq(rs.getInt("pseq"));
+			return doctormagagine;
+		}
+	};
+	
+	//처음 리스트
+	
+	public List<DoctorMagagine> getDoctorMagagineList() {
+		String query = "" +
+				"SELECT * FROM T_NF_DOCTOR_MAGAGINE";
+		return (List<DoctorMagagine>)this.jdbcTemplate.query(query, this.doctormagagineMapper);
+	}
+	
+	//월별 상위  
+	
+	public DoctorMagagine getTopMagagine(int maga_seq) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_MAGAGINE " +
+				"WHERE maga_seq = ? and askind = 4 ";
+		return (DoctorMagagine)this.jdbcTemplate.queryForObject(query, new Object[] { maga_seq }, this.doctormagagineMapper);
+	}
+	
+	//월별 상위  
+	
+		public List<DoctorMagagine> getSubMagagine(int maga_seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE pseq = ? and askind = 5 ";
+			return (List<DoctorMagagine>)this.jdbcTemplate.queryForObject(query, new Object[] { maga_seq }, this.doctormagagineMapper);
+		}
+		
+	
+
+	public void addDoctorMagagine(final DoctorMagagine doctormagagine) {
+		String query = "" +
+				"INSERT INTO T_NF_DOCTOR_MAGAGINE " +
+				"	(maga_seq, cotents, month, title, file_name, pseq) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			doctormagagine.getMagaSeq(),
+			doctormagagine.getCotents(),
+			doctormagagine.getMonth(),
+			doctormagagine.getTitle(),
+			doctormagagine.getFileName(),
+			doctormagagine.getPseq()
+		});
+	}
+
+	public void deleteDoctorMagagine(String maga_seq) {
+		String query = "DELETE FROM T_NF_DOCTOR_MAGAGINE WHERE maga_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { maga_seq });
+	}
+
+	public void updateDoctorMagagine(DoctorMagagine doctormagagine) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_MAGAGINE SET " +
+				"	maga_seq = ?, " +
+				"	cotents = ?, " +
+				"	month = ?, " +
+				"	title = ?, " +
+				"	file_name = ?, " +
+				"	pseq = ? " +
+				"WHERE maga_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			doctormagagine.getMagaSeq(),
+			doctormagagine.getCotents(),
+			doctormagagine.getMonth(),
+			doctormagagine.getTitle(),
+			doctormagagine.getFileName(),
+			doctormagagine.getPseq()
+		});
+	}
+
+	
+
+	/*public List<DoctorMagagine> getDoctorMagagineList(int page, int itemCountPerPage) {
+		String query = "" +
+				"SELECT TOP "+ itemCountPerPage +" maga_seq, cotents, month, title, file_name, pseq " +
+				"FROM T_NF_DOCTOR_MAGAGINE " +
+				"WHERE maga_seq <= ( " +
+				"	SELECT MIN(maga_seq) " +
+				"	FROM ( " +
+				"		SELECT TOP "+ ((page-1) * itemCountPerPage + 1) +" maga_seq " +
+				"		FROM T_NF_DOCTOR_MAGAGINE " +
+				"		ORDER BY maga_seq DESC " +
+				"	) AS A) " +
+				"ORDER BY maga_seq DESC";
+		return (List<DoctorMagagine>)this.jdbcTemplate.query(query, this.doctormagagineMapper);
+	}*/
+
+}

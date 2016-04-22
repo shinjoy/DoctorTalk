@@ -1,0 +1,1068 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"> -->
+<!--[if IE 6]><html lang="ko" class="no-js old ie6"><![endif]-->
+<!--[if IE 7]><html lang="ko" class="no-js old ie7"><![endif]-->
+<!--[if IE 8]><html lang="ko" class="no-js old ie8"><![endif]-->
+<!--[if IE 9]><html lang="ko" class="no-js ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--><html lang="ko" class="no-js modern"><!--<![endif]-->
+
+<% request.setCharacterEncoding("utf-8"); %>
+<%
+ response.setHeader("Cache-Control","no-cache"); 
+ response.setHeader("Pragma","no-cache"); 
+ response.setDateHeader("Expires",0); 
+%>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Doctortalk</title>
+	
+	<link rel="stylesheet" type="text/css" href="/css/bb-1.0.2.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bb-form-1.0.2.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bb-popup-1.0.1.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bb-popup-2.0.1.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bb-tab-1.0.1.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bb-table-1.0.2.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bb-admin-1.0.3.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bb-calendar-1.0.1.css" />
+
+	<script type="text/javascript" src="/lib/bestist/big-button-0.0.1.js"></script>
+	<script type="text/javascript" src="/lib/bestist/big-button-form-0.0.1.js"></script>
+	<script type="text/javascript" src="/lib/bestist/big-button-jquery-0.0.1.js"></script>
+	<script type="text/javascript" src="/lib/bestist/jquery.leanModal.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
+	
+	<!-- 달력 레이어 -->
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/lib/jquery/jquery.ui.datepicker-ko.js"></script>
+
+	<!-- DIV 스크롤 -->
+	<script type="text/javascript" src="/lib/iscroll/ender.js"></script>
+	<script type="text/javascript" src="/lib/iscroll/iscroll.js"></script>
+	<script type="text/javascript" src="/lib/iscroll/iscroll-lite.js"></script>
+
+	<script type="text/javascript" src="/lib/jquery/jquery.form.js"></script>
+
+
+<style>
+	body { padding:20px; background-color:#fff; }
+	h1 {font-weight:bold;font-size:14px;}
+	ol.my-form li {
+		list-style:decimal;
+		font-weight:bold;
+		font-size:16px;
+		margin-left:30px;
+	}
+	.div-title { border-bottom:1px solid #000; font-size:16px; font-weight:bold; margin-top:20px;}
+	.api { min-width:1100px; clear:both; margin-top:20px; }
+	.api dt { width:200px; }
+	.api .in { float:left; }
+	.api .out { float:left; width:600px; }
+	.api .in dt { clear:left; float:left; }
+	.api .in dd { float:left; }
+	.result-view { border:1px solid #aaa; padding:10px; clear:both; word-break:break-all; }
+	.real { color:#f40; min-height:26px; }
+	input { width:264px !important; }
+</style>
+
+<script>
+
+	$(document).ready(function() {
+		/* 폼 ajax전송 : http://malsup.com/jquery/form/#ajaxForm */
+		var options = {
+			//target :		'#user-join-result',
+			beforeSubmit :	formCheck,
+			success :		formSuccess
+		};
+		$('#user-login').ajaxForm(options);
+		$('#user-join').ajaxForm(options);
+		$('#check-id').ajaxForm(options);
+		$('#check-phone').ajaxForm(options);
+		$('#search-Id').ajaxForm(options);
+		$('#search-Pw').ajaxForm(options);
+		$('#new-Pw').ajaxForm(options);
+		$('#maga-list').ajaxForm(options);
+		$('#maga-health').ajaxForm(options);
+		$('#maga-report').ajaxForm(options);
+		
+		
+	});
+	
+	function formCheck(formData, jqForm, options) {
+		$("#"+resultDiv+"-result").html("");
+		return true; 
+	}
+	function formSuccess(responseText, statusText, xhr, $form) {
+		//alert('status: ' + statusText + '\n\nresponseText: \n' + responseText );
+		var json = JSON.parse(responseText);
+		try {
+			$("#"+resultDiv+"-result").html(responseText);
+		} catch (e) {
+            alert(json.message); 
+		}
+	}
+
+	var resultDiv;
+	function formSubmit(div) {
+		resultDiv = div;
+	}
+
+</script>
+
+</head>
+<body>
+
+<h1 class="ad_title">DoctorTalk Server API</h1>
+
+<div class="div-title">
+	회원관리
+</div>
+
+<ol class="my-form">
+	
+	
+	<div class="api">
+		<form method="post" id="user-login" name="userLoginForm" action="/m/login.go">
+			<li>모바일 로그인</li>
+			<h1 class="page-title">/m/login.go</h1>
+			<dl class="in">
+				<dt>UserId</dt> <dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>password</dt> <dd><input type="password" name="password" placeholder="password" class="bb"></dd>
+				<dt>os_version</dt> <dd><input type="text" name="osVersion" placeholder="os_version" class="bb"></dd>
+				<dt>os_type</dt> <dd><input type="text" name="osType" placeholder="osTyp" class="bb"></dd>
+				<dt>device_name</dt> <dd><input type="text" name="deviceName" placeholder="deviceName" class="bb"></dd>
+				<dt>device_id</dt> <dd><input type="text" name="deviceId" placeholder="deviceId" class="bb"></dd>
+				<dt>pushKey</dt> <dd><input type="text" name="pushKey" placeholder="pushKey" class="bb"></dd>
+				
+				
+				<dt>&nbsp;</dt>	 <dd><button type="submit" onclick="formSubmit('user-login');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{"message":"로그인이 성공되었습니다.","result":true}<br>
+					{"message":"해당 아이디는 존재하지 않습니다.","result":false}<br>
+					{"message":"비밀번호가 일치하지 않습니다.","result":false}
+				</div>
+				<div id="user-login-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="user-join" name="userJoinForm" action="/m/join.go">
+			<li>회원가입</li>
+			<h1 class="page-title">/m/join.go</h1>
+			<dl class="in">
+				<dt>userId</dt>		<dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>password</dt>		<dd><input type="password" name="password" placeholder="password" class="bb"></dd>
+				<dt>userName</dt>	<dd><input type="text" name="userName" placeholder="userName" class="bb"></dd>
+				<dt>phoneNumber</dt>	<dd><input type="text" name="phoneNumber" placeholder="phoneNumber" class="bb"></dd>
+				<dt>loginNaver</dt>	<dd><input type="text" name="loginNaver" placeholder="0:사용안함 1:사용" class="bb"></dd>
+				<dt>loginKakao</dt>	<dd><input type="text" name="loginKakao" placeholder="0:사용안함 1:사용" class="bb"></dd>
+				<dt>gender</dt>	<dd><dd><input type="text" name="gender" placeholder="1:남자 2:여자" class="bb"></dd>
+				<dt>appVersion</dt>	<dd><input type="text" name="appVersion" placeholder="appVersion" class="bb"></dd>
+				<dt>photo</dt>	<dd><input type="text" name="fileName"  class="bb"></dd>
+				 <dt>osType</dt>	<dd><input type="text" name="osType" placeholder="osType" class="bb"></dd>
+				<dt>osversion</dt>		<dd><input type="text" name="osversion" placeholder="osversion" class="bb"></dd>
+				<dt>deviceName</dt>		<dd><input type="text" name="deviceName" placeholder="deviceName" class="bb"></dd>
+				<dt>deviceId</dt>		<dd><input type="text" name="deviceId" placeholder="deviceId" class="bb"></dd>
+				<dt>pushKey</dt>		<dd><input type="text" name="pushKey" placeholder="pushKey" class="bb"></dd>
+				<dt>birthday</dt>		<dd><input type="text" name="birthday" placeholder="birthday" class="bb"></dd>
+				<dt>usePushservice</dt><dd><input type="text" name="usePushservice" placeholder="0:사용안함 1:사용" class="bb"></dd>
+				<dt>userType</dt>		<dd><input type="text" name="userType" placeholder="1: 최고관리자, 2:상담자, 3:일반회원" class="bb"></dd>
+				<dt>&nbsp;</dt>		<dd><button type="submit" onclick="formSubmit('user-join');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{"message":"회원가입되었습니다.","result":true}<br>
+					{"message":"존재하는 아이디 입니다.","result":false}
+				</div>
+				<div id="user-join-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="check-id" name="checkIdForm" action="/m/dup_check_id.go">
+			<li>아이디중복체크</li>
+			<h1 class="page-title">/m/dup_check_id.go</h1>
+			<dl class="in">
+				<dt>userId</dt>	<dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>&nbsp;</dt>	<dd><button type="submit" onclick="formSubmit('check-id');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{"message":"중복된 이메일 주소입니다 다른주소로 입력해주세요.
+					       지속적인 문제 발생시 (관리자이메일)로 이메일을 보내주세요","result":true}<br>
+					{"message":"사용가능한 이메일입니다.","result":false}<br>
+				</div>
+				<div id="check-id-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="check-phone" name="checkphForm" action="/m/dup_check_phone.go">
+			<li>전화번호중복체크</li>
+			<h1 class="page-title">/m/dup_check_phone.go</h1>
+			<dl class="in">
+				<dt>phoneNumber</dt>	<dd><input type="text" name="phoneNumber" placeholder="phoneNumber" class="bb"></dd>
+				<dt>&nbsp;</dt>	<dd><button type="submit" onclick="formSubmit('check-phone');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{"message":"사용중인 전화번호 입니다.","result":true}<br>
+					{"message":"사용할 수 있는 전화번호입니다..","result":false}<br>
+				</div>
+				<div id="check-phone-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="search-Id" name="searchIdForm" action="/m/myid.go">
+			<li>아이디 찾기</li>
+			<h1 class="page-title">/m/myid.go</h1>
+			<dl class="in">
+				<dt>userName</dt>	<dd><input type="text" name="userName" placeholder="userName" class="bb"></dd>
+				<dt>phoneNumber</dt><dd><input type="text" name="phoneNumber" placeholder="phoneNumber" class="bb"></dd>
+				<dt>&nbsp;</dt>		<dd><button type="submit" onclick="formSubmit('search-Id');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{{userId},"result":true}<br>
+					{"message":"회원님의 ID를 찾을 수 없습니다.아직 회원이 아니시면 아래 회원가입 버튼을 클릭해 주세요","result":false}<br>
+
+				</div>
+				<div id="search-Id-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="search-Pw" name="searchpwForm" action="/m/mypass.go">
+			<li>비밀번호 찾기</li>
+			<h1 class="page-title">/m/mypass.go</h1>
+			<dl class="in">
+				<dt>userId</dt>	    <dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>phoneNumber</dt><dd><input type="text" name="phoneNumber" placeholder="phoneNumber" class="bb"></dd>
+				<dt>&nbsp;</dt>		<dd><button type="submit" onclick="formSubmit('search-Pw');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{"message":"비밀번호를 재설정해주세요."->비밀번호변경 페이지로,"result":true}<br>
+					{"message":"회원님의 데이터를 찾을 수 없습니다.아직 회원이 아니시면 아래 회원가입 버튼을 클릭해 주세요","result":false}<br>
+
+				</div>
+				<div id="search-Pw-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="new-Pw" name="newpwForm" action="/m/new_mypass.go">
+			<li>비밀번호 재설정</li>
+			<h1 class="page-title">/m/new_mypass.go</h1>
+			<dl class="in">
+				<dt>userId</dt>	    <dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>password</dt> <dd><input type="password" name="password" placeholder="password" class="bb"></dd>
+				
+				<dt>&nbsp;</dt>		<dd><button type="submit" onclick="formSubmit('new-Pw');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{"message":"완료되었습니다.","result":true}<br>
+					
+
+				</div>
+				<div id="new-Pw-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<br>
+	<br>
+	<br>
+	<div class="div-title">
+	  회원정보
+	</div>
+	
+	<div class="api">
+		<form method="post" id="maga-list" name="maga-listForm" action="/m/maga_list.go">
+			<li>건강매거진</li>
+			<h1 class="page-title">/m/maga_list.go</h1>
+			<dl class="in">
+				<dt>userId</dt>	    <dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>&nbsp;</dt>		<dd><button type="submit" onclick="formSubmit('maga-list');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{{userreport},{magazine},"result":true}<br>
+					
+
+				</div>
+				<div id="maga-list-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="maga-health" name="maga-healthForm" action="/m/maga_health.go">
+			<li>수행내역리포트</li>
+			<h1 class="page-title">/m/maga_health.go</h1>
+			<dl class="in">
+				<dt>userId</dt>	    <dd><input type="text" name="userId" placeholder="userId" class="bb"></dd>
+				<dt>month</dt>	    <dd><input type="text" name="month" placeholder="month" class="bb"></dd>
+				<dt>&nbsp;</dt>		<dd><button type="submit" onclick="formSubmit('maga-health');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{{blood},{goalblood}}
+					{{pressure},{goalpressure}}
+					{{weight},{goalweight}}<br>
+					
+
+				</div>
+				<div id="maga-health-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="maga-report" name="maga-reportForm" action="/m/maga_report.go">
+			<li>매거진</li>
+			<h1 class="page-title">/m/maga_report.go</h1>
+			<dl class="in">
+				<dt>magaSeq</dt>	    <dd><input type="text" name="magaSeq" placeholder="magaSeq" class="bb"></dd>
+				<dt>kind</dt>	    <dd><input type="text" name="kind" placeholder="0:상위 1:하위" class="bb"></dd>
+				<dt>&nbsp;</dt>		<dd><button type="submit" onclick="formSubmit('maga-health');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{{topmagazine},{submagazine}}<br>
+					
+
+				</div>
+				<div id="maga-report-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	
+	<!--
+	
+	<div class="api">
+		<form method="post" id="withdraw" name="withdrawForm" action="/m/withdraw.go">
+			<li>탈퇴하기</li>
+			<h1 class="page-title">/m/withdraw.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('withdraw');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+					{"message":"로그아웃 성공","result":true}
+				</div>
+				<div id="withdraw-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+		
+	<div class="api">
+		<form method="post" id="get-area" name="areaForm" action="/m/get_area.go">
+			<li>지역 찾기</li>
+			<h1 class="page-title">/m/get_area.go</h1>
+			<dl class="in">
+				<dt>reqType</dt>					<dd><input type="text" name="reqType" placeholder="1:시도검색 2:구군검색" class="bb"></dd>
+				<dt>sido</dt>					<dd><input type="text" name="sido" placeholder="구군검색일때만 필요" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('get-area');" class="bb round green" style="width:274px;">확인</button></dd>
+				<dt>&nbsp;</dt>					<dd>시도검색:reqType=1, sido="",<br> 구군검색:reqType=2, sido="서울"</dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="get-area-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+
+	<div class="api">
+		<form method="post" id="get-category" name="categorySubForm" action="/m/get_category.go">
+			<li>서브 카테고리</li>
+			<h1 class="page-title">/m/get_category.go</h1>
+			<dl class="in">
+				<dt>seq</dt>					<dd><input type="text" name="seq" placeholder="0:대분류, 나머지는 소분류" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('get-category');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="get-category-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="company_recommend" name="mainRecommendListForm" action="/m/company_recommend.go">
+			<li>메인 추천업체 리스트</li>
+			<h1 class="page-title">/m/company_recommend.go</h1>
+			<dl class="in">
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('company_recommend');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="company_recommend-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="company-list" name="mainCompanyListForm" action="/m/company_list.go">
+			<li>메인 업체 리스트</li>
+			<h1 class="page-title">/m/company_list.go</h1>
+			<dl class="in">
+				<dt>category1</dt>				<dd><input type="text" name="category1" placeholder="0:전체" class="bb"></dd>
+				<dt>category2</dt>				<dd><input type="text" name="category2" placeholder="0:전체" class="bb"></dd>
+				<dt>keyword</dt>				<dd><input type="text" name="keyword" placeholder="업체명 검색" class="bb"></dd>
+				<dt>latitude</dt>				<dd><input type="text" name="latitude" placeholder="위도" class="bb"></dd>
+				<dt>longitude</dt>				<dd><input type="text" name="longitude" placeholder="경도" class="bb"></dd>
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>page</dt>					<dd><input type="text" name="page" placeholder="1" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('company-list');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="company-list-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="company-info" name="mainCompanyInfoForm" action="/m/company_info.go">
+			<li>업체 정보</li>
+			<h1 class="page-title">/m/company_info.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="이메일" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('company-info');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="company-info-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="company-edit" name="companyEditForm" action="/m/company_edit.go" enctype="multipart/form-data">
+			<li>업체 정보 수정</li>
+			<h1 class="page-title">/m/company_edit.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>companyType</dt>			<dd><input type="text" name="companyType" placeholder="" class="bb"></dd>
+				<dt>companyName</dt>			<dd><input type="text" name="companyName" placeholder="" class="bb"></dd>
+				<dt>category1</dt>				<dd><input type="text" name="category1" placeholder="" class="bb"></dd>
+				<dt>category2</dt>				<dd><input type="text" name="category2" placeholder="" class="bb"></dd>
+				<dt>phoneNumber</dt>			<dd><input type="text" name="phoneNumber" placeholder="" class="bb"></dd>
+				<dt>sido</dt>					<dd><input type="text" name="sido" placeholder="" class="bb"></dd>
+				<dt>gugun</dt>					<dd><input type="text" name="gugun" placeholder="" class="bb"></dd>
+				<dt>address</dt>				<dd><input type="text" name="address" placeholder="" class="bb"></dd>
+				<dt>introduce</dt>				<dd><input type="text" name="introduce" placeholder="" class="bb"></dd>
+
+				<dt>isMember</dt>				<dd><input type="text" name="isMember" placeholder="" class="bb"></dd>
+				<dt>isApproval</dt>				<dd><input type="text" name="isApproval" placeholder="" class="bb"></dd>
+				<dt>saveCash</dt>				<dd><input type="text" name="saveCash" placeholder="" class="bb"></dd>
+				<dt>saveCard</dt>				<dd><input type="text" name="saveCard" placeholder="" class="bb"></dd>
+				<dt>saveDamoin</dt>				<dd><input type="text" name="saveDamoin" placeholder="" class="bb"></dd>
+				<dt>isDelivery</dt>				<dd><input type="text" name="isDelivery" placeholder="" class="bb"></dd>
+
+				<dt>openTime</dt>				<dd><input type="text" name="openTime" placeholder="" class="bb"></dd>
+				<dt>closeTime</dt>				<dd><input type="text" name="closeTime" placeholder="" class="bb"></dd>
+				<dt>holiday</dt>				<dd><input type="text" name="holiday" placeholder="" class="bb"></dd>
+
+				<dt>img1</dt>					<dd><input type="text" name="img1" placeholder="" class="bb"></dd>
+				<dt>img2</dt>					<dd><input type="text" name="img2" placeholder="" class="bb"></dd>
+				<dt>img3</dt>					<dd><input type="text" name="img3" placeholder="" class="bb"></dd>
+				<dt>img4</dt>					<dd><input type="text" name="img4" placeholder="" class="bb"></dd>
+				<dt>img5</dt>					<dd><input type="text" name="img5" placeholder="" class="bb"></dd>
+
+				<dt>isMenu</dt>					<dd><input type="text" name="isMenu" placeholder="" class="bb"></dd>
+				<dt>latitude</dt>				<dd><input type="text" name="latitude" placeholder="" class="bb"></dd>
+				<dt>longitude</dt>				<dd><input type="text" name="longitude" placeholder="" class="bb"></dd>
+				<dt>isRecommend</dt>			<dd><input type="text" name="isRecommend" placeholder="" class="bb"></dd>
+
+				<dt>photo1</dt>					<dd><input type="file" name="photo1" class="bb"></dd>
+				<dt>photo2</dt>					<dd><input type="file" name="photo2" class="bb"></dd>
+				<dt>photo3</dt>					<dd><input type="file" name="photo3" class="bb"></dd>
+				<dt>photo4</dt>					<dd><input type="file" name="photo4" class="bb"></dd>
+				<dt>photo5</dt>					<dd><input type="file" name="photo5" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('company-edit');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="company-edit-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	
+	<div class="api">
+		<form method="post" id="company-photo-add" name="companyPhotoAddForm" action="/m/company_photo_add.go">
+			<li>매장 이미지 등록</li>
+			<h1 class="page-title">/m/company_photo_add.go</h1>
+			<dl class="in">
+				<dt>photo1</dt>					<dd><input type="file" name="photo1" class="bb"></dd>
+				<dt>photo2</dt>					<dd><input type="file" name="photo2" class="bb"></dd>
+				<dt>photo3</dt>					<dd><input type="file" name="photo3" class="bb"></dd>
+				<dt>photo4</dt>					<dd><input type="file" name="photo4" class="bb"></dd>
+				<dt>photo5</dt>					<dd><input type="file" name="photo5" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('company-photo-add');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="company-photo-add-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="company-photo-delete" name="companyPhotoDeleteForm" action="/m/company_photo_delete.go">
+			<li>매장 이미지 삭제</li>
+			<h1 class="page-title">/m/company_photo_delete.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>photoName</dt>				<dd><input type="text" name="photoName" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('company-photo-delete');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="company-photo-delete-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	 
+	<div class="api">
+		<form method="post" id="menu-edit" name="menuEditForm" action="/m/menu_edit.go" enctype="multipart/form-data">
+			<li>메뉴 등록</li>
+			<h1 class="page-title">/m/menu_edit.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>menuSeq</dt>				<dd><input type="text" name="menuSeq" placeholder="" class="bb"></dd>
+				<dt>menuName</dt>				<dd><input type="text" name="menuName" placeholder="" class="bb"></dd>
+				<dt>cover</dt>					<dd><input type="text" name="cover" placeholder="한줄소개" class="bb"></dd>
+				<dt>menuOption1</dt>			<dd><input type="text" name="menuOption1" placeholder="" class="bb"></dd>
+				<dt>menuPrice1</dt>				<dd><input type="text" name="menuPrice1" placeholder="" class="bb"></dd>
+				<dt>menuOption2</dt>			<dd><input type="text" name="menuOption2" placeholder="" class="bb"></dd>
+				<dt>menuPrice2</dt>				<dd><input type="text" name="menuPrice2" placeholder="" class="bb"></dd>
+				<dt>menuOption3</dt>			<dd><input type="text" name="menuOption3" placeholder="" class="bb"></dd>
+				<dt>menuPrice3</dt>				<dd><input type="text" name="menuPrice3" placeholder="" class="bb"></dd>
+				<dt>menuOption4</dt>			<dd><input type="text" name="menuOption4" placeholder="" class="bb"></dd>
+				<dt>menuPrice4</dt>				<dd><input type="text" name="menuPrice4" placeholder="" class="bb"></dd>
+				<dt>menuOption5</dt>			<dd><input type="text" name="menuOption5" placeholder="" class="bb"></dd>
+				<dt>menuPrice5</dt>				<dd><input type="text" name="menuPrice5" placeholder="" class="bb"></dd>
+
+				<dt>introduce</dt>				<dd><input type="text" name="introduce" placeholder="" class="bb"></dd>
+				<dt>infoUse</dt>				<dd><input type="text" name="infoUse" placeholder="" class="bb"></dd>
+				<dt>infoDelivery</dt>			<dd><input type="text" name="infoDelivery" placeholder="" class="bb"></dd>
+				<dt>sort</dt>					<dd><input type="text" name="sort" placeholder="" class="bb"></dd>
+
+				<dt>photo1</dt>					<dd><input type="file" name="photo1" class="bb"></dd>
+
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('menu-edit');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="menu-edit-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="menu-photo-add" name="menuPhotoAddForm" action="/m/menu_photo_add.go" enctype="multipart/form-data">
+			<li>메뉴 이미지 등록</li>
+			<h1 class="page-title">/m/menu_photo_add.go</h1>
+			<dl class="in">
+				<dt>menuSeq</dt>				<dd><input type="text" name="menuSeq" placeholder="" class="bb"></dd>
+				<dt>photo1</dt>					<dd><input type="file" name="photo1" class="bb"></dd>
+				<dt>photo2</dt>					<dd><input type="file" name="photo2" class="bb"></dd>
+				<dt>photo3</dt>					<dd><input type="file" name="photo3" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('menu-photo-add');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="menu-photo-add-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="menu-photo-delete" name="menuPhotoDeleteForm" action="/m/menu_photo_delete.go">
+			<li>메뉴 이미지 등록</li>
+			<h1 class="page-title">/m/menu_photo_delete.go</h1>
+			<dl class="in">
+				<dt>menuSeq</dt>				<dd><input type="text" name="menuSeq" placeholder="" class="bb"></dd>
+				<dt>photoName</dt>				<dd><input type="text" name="photoName" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('menu-photo-delete');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="menu-photo-delete-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	
+	<div class="api">
+		<form method="post" id="menu-list" name="menuListForm" action="/m/menu_list.go">
+			<li>업체 메뉴리스트</li>
+			<h1 class="page-title">/m/menu_list.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('menu-list');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="menu-list-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+		
+
+	<div class="api">
+		<form method="post" id="menu-detail" name="menuDetailForm" action="/m/menu_detail.go">
+			<li>업체 메뉴 상세정보</li>
+			<h1 class="page-title">/m/menu_detail.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>menuSeq</dt>				<dd><input type="text" name="menuSeq" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('menu-detail');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="menu-detail-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+		
+	<div class="api">
+		<form method="post" id="review-list" name="reviewListForm" action="/m/review_list.go">
+			<li>리뷰 리스트</li>
+			<h1 class="page-title">/m/review_list.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>page</dt>					<dd><input type="text" name="page" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('review-list');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="review-list-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+		
+	<div class="api">
+		<form method="post" id="review-edit" name="reviewEditForm" action="/m/review_edit.go">
+			<li>리뷰 등록</li>
+			<h1 class="page-title">/m/review_edit.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>userName</dt>				<dd><input type="text" name="userName" placeholder="" class="bb"></dd>
+				<dt>contents</dt>				<dd><input type="text" name="contents" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('review-edit');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="review-edit-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="review-reply-edit" name="reviewReplyEditForm" action="/m/review_reply_edit.go">
+			<li>리뷰 등록</li>
+			<h1 class="page-title">/m/review_reply_edit.go</h1>
+			<dl class="in">
+				<dt>parentSeq</dt>				<dd><input type="text" name="parentSeq" placeholder="" class="bb"></dd>
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>userName</dt>				<dd><input type="text" name="userName" placeholder="" class="bb"></dd>
+				<dt>contents</dt>				<dd><input type="text" name="contents" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('review-reply-edit');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="review-reply-edit-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="regular-edit" name="regularEditForm" action="/m/regular_edit.go">
+			<li>단골 등록</li>
+			<h1 class="page-title">/m/regular_edit.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('regular-edit-edit');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="regular-edit-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="regular-delete" name="regularDeleteForm" action="/m/regular_delete.go">
+			<li>단골 해제</li>
+			<h1 class="page-title">/m/regular_delete.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('regular-delete-edit');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="regular-delete-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="regular-shop-list" name="regularShopListForm" action="/m/regular_shop_list.go">
+			<li>단골 리스트</li>
+			<h1 class="page-title">/m/regular_shop_list.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>page</dt>					<dd><input type="text" name="page" placeholder="" class="bb"></dd>
+				<dt>latitude</dt>				<dd><input type="text" name="latitude" placeholder="위도" class="bb"></dd>
+				<dt>longitude</dt>				<dd><input type="text" name="longitude" placeholder="경도" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('regular-shop-list');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="regular-shop-list-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="profile" name="profileForm" action="/m/profile.go">
+			<li>프로필 보기</li>
+			<h1 class="page-title">/m/profile.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('profile');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="profile-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="profile-edit" name="profileEditForm" action="/m/profile_edit.go">
+			<li>프로필 정보수정</li>
+			<h1 class="page-title">/m/profile_edit.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>password</dt>				<dd><input type="text" name="password" placeholder="" class="bb"></dd>
+				<dt>newPw</dt>					<dd><input type="text" name="newPw" placeholder="" class="bb"></dd>
+				<dt>birthday</dt>				<dd><input type="text" name="birthday" placeholder="" class="bb"></dd>
+				<dt>sido</dt>					<dd><input type="text" name="sido" placeholder="" class="bb"></dd>
+				<dt>gugun</dt>					<dd><input type="text" name="gugun" placeholder="" class="bb"></dd>
+				<dt>gender</dt>					<dd><input type="text" name="gender" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('profile-edit');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="profile-edit-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="profile_photo_add" name="profilePhotoAddForm" action="/m/profile_photo_add.go" enctype="multipart/form-data">
+			<li>프로필 사진 수정</li>
+			<h1 class="page-title">/m/profile_photo_add.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>photo</dt>					<dd><input type="file" name="photo" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('profile_photo_add');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="profile_photo_add-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="profile_photo_delete" name="profilePhotoDeleteForm" action="/m/profile_photo_delete.go">
+			<li>프로필 사진 삭제</li>
+			<h1 class="page-title">/m/profile_photo_delete.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('profile_photo_delete');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="profile_photo_delete-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="regular-customer-list" name="regularCustomerListForm" action="/m/regular_customer_list.go">
+			<li>업체 단골 리스트</li>
+			<h1 class="page-title">/m/regular_customer_list.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>page</dt>					<dd><input type="text" name="page" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('regular-customer-list');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="regular-customer-list-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="message-send" name="messageSendForm" action="/m/message_send.go" enctype="multipart/form-data">
+			<li>단골 메세지 푸시전송</li>
+			<h1 class="page-title">/m/message_send.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="수신자. 여러명일 경우 쉼표(,)로 구분" class="bb"></dd>
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>contents</dt>				<dd><input type="text" name="contents" placeholder="" class="bb"></dd>
+				<dt>photo</dt>					<dd><input type="file" name="photo" class="bb"></dd>
+				<dt>companyName</dt>				<dd><input type="text" name="companyName" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('message-send');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="message-send-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="message-list" name="messageListForm" action="/m/message_list.go">
+			<li>단골 메세지 리스트</li>
+			<h1 class="page-title">/m/message_list.go</h1>
+			<dl class="in">
+				<dt>companySeq</dt>				<dd><input type="text" name="companySeq" placeholder="" class="bb"></dd>
+				<dt>page</dt>					<dd><input type="text" name="page" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('message-list');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="message-list-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="alert-list" name="alertListForm" action="/m/alert_list.go">
+			<li>알림내역</li>
+			<h1 class="page-title">/m/alert_list.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>page</dt>					<dd><input type="text" name="page" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('alert-list');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="alert-list-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="check_alert" name="alertListForm" action="/m/check_alert.go">
+			<li>알림내역 존재여부</li>
+			<h1 class="page-title">/m/check_alert.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('check_alert');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="check_alert-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="alert_clear" name="alertListForm" action="/m/alert_clear.go">
+			<li>알림내역 모두 삭제</li>
+			<h1 class="page-title">/m/alert_clear.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('alert_clear');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="alert_clear-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="apply-add" name="applyAddForm" action="/m/apply_add.go">
+			<li>가맹/영업점 신청</li>
+			<h1 class="page-title">/m/apply_add.go</h1>
+			<dl class="in">
+				<dt>userId</dt>					<dd><input type="text" name="userId" placeholder="" class="bb"></dd>
+				<dt>companyType</dt>			<dd><input type="text" name="companyType" placeholder="" class="bb"></dd>
+				<dt>companyName</dt>			<dd><input type="text" name="companyName" placeholder="" class="bb"></dd>
+				<dt>phoneNumber</dt>			<dd><input type="text" name="phoneNumber" placeholder="" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('apply-add');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="apply-add-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div>
+	
+	<div class="api">
+		<form method="post" id="profile-img-up" name="profileImgUpForm" action="/m/message_photo_add.go" enctype="multipart/form-data">
+			<li>프로필사진 업로드</li>
+			<h1 class="page-title">/m/message_photo_add.go</h1>
+			<dl class="in">
+				<dt>photo</dt>				<dd><input type="file" name="photo" class="bb"></dd>
+				<dt>photo2</dt>				<dd><input type="file" name="photo2" class="bb"></dd>
+				<dt>photo3</dt>				<dd><input type="file" name="photo3" class="bb"></dd>
+				<dt>photo4</dt>				<dd><input type="file" name="photo4" class="bb"></dd>
+				<dt>photo5</dt>				<dd><input type="file" name="photo5" class="bb"></dd> 
+				<dt>menuSeq</dt>					<dd><input type="text" name="menuSeq" placeholder="menuSeq" class="bb"></dd>
+				<dt>&nbsp;</dt>					<dd><button type="submit" onclick="formSubmit('profile-img-up');" class="bb round green" style="width:274px;">확인</button></dd>
+			</dl>
+			<div class="out">
+				<div class="result-view">
+
+				</div>
+				<div id="profile-img-up-result" class="result-view real"></div>
+			</div>
+			<div class="clear"></div>
+		</form>
+	</div> -->
+	
+</ol>
+
+</body>
+</html>

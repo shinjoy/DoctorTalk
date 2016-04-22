@@ -1,0 +1,171 @@
+
+/* 로그인 폼박스 */
+#logbox { padding:18px; }
+
+/* 로그인 폼 */
+body.login {background:#333 url('/images/log_bg.png') repeat 0 0 ; text-align:center;display:block}
+.logbox {
+	background-color:#aaa;
+	border:1px solid #ededed;
+	width:330px;
+	height:180px;
+	margin:auto;
+	padding:35px 30px;
+	 -moz-liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%); -webkit-gradient(liner, left top, left bottom, color-stop(0%,#f7f7f7), solor-stop(100%,#e9e9e9));
+	-webkit-liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%); -o-liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%); -ms-liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%); liner-gradient(top, #f7f7f7 0%, #e9e9e9 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#e9e9e9',GradientType=0 ); /* IE6-9 */	-webkit-border-radius: 3px;	-moz-border-radius: 3px;	border-radius: 3px;
+	border:1px solid #ddd;
+}
+h1.ad_title {font-family:'arial'; font-size:28px; font-weight:bold; color:#555; margin-top:17px;}
+h3.ad_title1 {font-family:'arial'; font-size:16px; color:#777;}
+h2.ad_title2 {font-family:arial; font-size:18px; color:#666; text-align:left; letter-spacing:-0.5px; }
+h4.ad_title3 {font-family:돋움; font-size:11px; color:#666; text-align:left; margin:5px 0px 25px 0px; }
+.logo {margin:100px 0px 40px 0px;}
+.log_form {text-align:left; margin-top:20px;}
+.log_form li {margin-top:5px; text-align:center;}
+.log_form li input {width:320px;}
+
+
+
+
+/* header *********************************************/
+header {
+	background-color:#333;
+	width:100%;
+	padding:10px;
+	color:#fff;
+	font-size:14px;
+	min-width:1000px;
+}
+header.fixed {
+	position:fixed;
+	top:0;
+	z-index:1000;
+}
+header.sub {
+	background-color:#444;
+}
+article {
+	min-width:1000px;
+	margin-bottom:100px;
+}
+.article-main {
+	background-color:#eee;
+	padding:20px;
+}
+.article-main .title {
+	border-bottom:1px dotted #333;
+	padding:0 0 5px 0;
+	margin-bottom:5px;
+}
+.article-main .title .title-text {
+	padding:10px 0;
+	font-size:14px;
+	font-weight:bold;
+}
+
+.article {
+	padding:10px;
+}
+.article .arrow {
+	float:right;
+	padding-top:20px;
+}
+.article .dialog-box {
+	float:right;
+	width:90%;
+	border:1px solid #555;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	border-radius: 10px;
+}
+.article .title {
+	background-color:#555;
+	color:#aaa;
+	padding:5px 10px;
+	font-size:14px;
+	-moz-border-radius: 8px 8px 0 0;
+	-webkit-border-radius: 8px 8px 0 0;
+	-khtml-border-radius: 8px 8px 0 0;
+	border-radius: 8px 8px 0 0;
+}
+.article .title .title-text {
+	font-weight:bold;
+	color:#fff;
+}
+.article .contents {
+	padding:10px;
+}
+.article .files, .article-main .files {
+	padding:10px;
+}
+.article .info {
+	float:right;
+	width:80px;
+	border:1px solid #555;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+}
+.article .info .info-title {
+	background-color:#555;
+	-moz-border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+	-khtml-border-radius: 4px 4px 0 0;
+	border-radius: 4px 4px 0 0;
+	font-weight:bold;
+	color:#fff;
+	padding:5px;
+	text-align:center;
+}
+.article .info .info-sub {
+	padding:5px;
+	text-align:center;
+}
+.article .info .info-sub button {
+	margin:3px 0;
+}
+.article .comments {
+	padding:10px;
+}
+
+.comment-write {
+	border-bottom:1px dotted #999;
+	padding-bottom:10px;
+}
+.comment-write .comment-writer {
+	width:120px;
+	padding-top:8px;
+}
+.comment-list {
+	border-bottom:1px dotted #999;
+	padding:3px 0;
+}
+.comment-list .comment-header {
+	color:#666;
+}
+
+/* 업체관리 ***************************************************/
+.page-title {
+	font-weight:bold;
+	font-size:16px;
+	margin-right:20px;
+	padding-top:8px;
+}
+ul.float {
+	margin:0 0 5px 0;
+}
+ul.float li {
+	float:left;
+	margin-right:10px;
+}
+.article .round-box {
+	width:975px;
+	border:1px solid #555;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	border-radius: 10px;
+}

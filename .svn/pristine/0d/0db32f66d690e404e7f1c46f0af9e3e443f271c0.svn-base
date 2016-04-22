@@ -1,0 +1,235 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import kr.nomad.mars.dto.Magazine;
+import kr.nomad.mars.dto.Notice;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+public class MagazineDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper magazineMapper = new RowMapper() {
+		public Magazine mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Magazine magazine = new Magazine();
+			magazine.setmSeq(rs.getInt("m_seq"));
+			magazine.setContents(rs.getString("contents"));
+			magazine.setMonth(rs.getString("month"));
+			magazine.setTitle(rs.getString("title"));
+			magazine.setFileName(rs.getString("file_name"));
+			magazine.setSubTitle(rs.getString("sub_title"));
+			magazine.setThumFile(rs.getString("thum_file"));
+			magazine.setRegDate(rs.getString("reg_date"));
+			return magazine;
+		}
+	};
+
+	public int addMagazine(final Magazine magazine) {
+	    String query = ""
+	            + "    INSERT INTO T_NF_DOCTOR_MAGAZINE "
+	            + "        (month, title, sub_title, contents, file_name, thum_file, reg_date) "
+	            + "    VALUES "
+	            + "        (?, ?, ?, ?, ?, ?, getDate()) "
+	            + "    SELECT SCOPE_IDENTITY() AS m_seq ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] {
+	    	magazine.getMonth(),
+	    	magazine.getTitle(),
+	    	magazine.getSubTitle(),
+	    	magazine.getContents(),
+	    	magazine.getFileName(),
+	    	magazine.getThumFile()
+	    });
+	}
+
+	public void updateMagazine(Magazine magazine) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_MAGAZINE SET " +
+				"	month = ?, " +
+				"	title = ?, " +
+				"	sub_title = ?, " +
+				"	contents = ?, " +
+				"	file_name = ?, " +
+				"	thum_file = ? " +
+				"WHERE m_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+	    	magazine.getMonth(),
+	    	magazine.getTitle(),
+	    	magazine.getSubTitle(),
+	    	magazine.getContents(),
+	    	magazine.getFileName(),
+	    	magazine.getThumFile(),
+			magazine.getmSeq()
+		});
+	}
+	public void updateMagazineFile(int mSeq, String fileName) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_MAGAZINE SET " +
+				"	file_name = ?, " +
+				"	thum_file = ? " +
+				"WHERE m_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { fileName, fileName, mSeq });
+	}
+
+
+	public List<Magazine> getMagazineList(int page, int itemCountPerPage) {
+		String query = ""
+	            + "    SELECT * FROM ( "
+	            + "        SELECT "
+	            + "            ROW_NUMBER() OVER(ORDER BY reg_date DESC) as row_seq, "
+	            + "            * "
+	            + "        FROM T_NF_DOCTOR_MAGAZINE "
+	            + "    ) AS a WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") +1 AND "+page+" * "+itemCountPerPage+" ";
+	    return (List<Magazine>)this.jdbcTemplate.query(query, this.magazineMapper);
+	}
+	public int getCount() {
+	    String query = " SELECT COUNT(*) FROM T_NF_DOCTOR_MAGAZINE ";
+	    return this.jdbcTemplate.queryForInt(query);
+	}
+
+	public List<Magazine> getMagazineList(String keyword, int page, int itemCountPerPage) {
+		String query = ""
+	            + "    SELECT * FROM ( "
+	            + "        SELECT "
+	            + "            ROW_NUMBER() OVER(ORDER BY month DESC) as row_seq, "
+	            + "            * "
+	            + "        FROM T_NF_DOCTOR_MAGAZINE "
+	            + "		   WHERE (title like ? OR subtitle like ? OR contents like ?) "
+	            + "    ) AS a WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") +1 AND "+page+" * "+itemCountPerPage+" ";
+	    return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%" }, this.magazineMapper);
+	}
+	public int getCount(String keyword) {
+	    String query = " SELECT COUNT(*) FROM T_NF_DOCTOR_MAGAZINE WHERE (title like ? OR subtitle like ? OR contents like ?) ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] { "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%" });
+	}
+
+	//처음 리스트
+	public List<Magazine> getMagazineList() {
+		String query = "" +
+				"SELECT * FROM T_NF_DOCTOR_MAGAZINE order by reg_date desc";
+		return (List<Magazine>)this.jdbcTemplate.query(query, this.magazineMapper);
+	}
+	
+	//처음 뷰
+	public Magazine getMagazine(int seq) {
+		String query = "" +
+				"SELECT * FROM T_NF_DOCTOR_MAGAZINE where m_seq = ?";
+		return (Magazine)this.jdbcTemplate.queryForObject(query,  new Object[] { seq } ,this.magazineMapper);
+	}
+
+	//월별 상위  
+	
+	public Magazine getTopMagazine(String today) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_MAGAZINE " +
+				"WHERE month = ? ";
+		try{
+			return (Magazine)this.jdbcTemplate.queryForObject(query, new Object[] { today }, this.magazineMapper);
+		}catch(Exception e){
+			return new Magazine();
+		}
+		
+	}
+	
+	public void deleteMagazinePageMain(int m_seq) {
+		String query = "DELETE FROM T_NF_DOCTOR_MAGAZINE WHERE m_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { m_seq });
+	}
+
+	
+/*	//월별 상위  
+	
+	public Magazine getTopMagagine(int maga_seq) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_MAGAZINE " +
+				"WHERE maga_seq = ? and askind = 4";
+		return (Magazine)this.jdbcTemplate.queryForObject(query, new Object[] { maga_seq }, this.magazineMapper);
+	}*/
+	
+/*	//월별 하위  
+	
+		public List<Magazine> getSubMagagine(int maga_seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAZINE " +
+					"WHERE pseq = ? and askind = 5 ";
+			return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { maga_seq }, this.magazineMapper);
+		}*/
+		
+/*	//1개월 컨텐츠 질문
+		
+	public List<Magazine> getmglist(String month) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE month = ? and askind = 1"+
+					"ORDER BY sort ASC";
+			
+		return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { month } , this.magazineMapper);
+	}
+	
+	//답변
+	public List<Magazine> getmagaAnswerList(int seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE askind = 2 and pseq =?" + 
+					"ORDER BY sort ASC ";
+		return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { seq }, this.magazineMapper);
+	}		
+	
+	
+
+	//1개월지표질문
+	public List<Magazine> getmonMagagine() {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_MAGAGINE " +
+				"WHERE askind = 6"+
+				"ORDER BY sort ASC";
+		return (List<Magazine>)this.jdbcTemplate.query(query, this.magazineMapper);
+	}
+	//1개월지표답변
+	public List<Magazine> getmonAnswerList(int seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE askind = 7 and pseq = ? " + 
+					"ORDER BY sort ASC ";
+		return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { seq }, this.magazineMapper);
+	}
+	
+	//1주지표질문
+	public List<Magazine> getweekMagagine() {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_MAGAGINE " +
+				"WHERE askind = 8"+
+				"ORDER BY sort ASC";
+		return (List<Magazine>)this.jdbcTemplate.query(query, this.magazineMapper);
+	}
+	//1주지표답변
+	public List<Magazine> getweekAnswerList(int seq) {
+			String query = "" + 
+					"SELECT * " +
+					"FROM T_NF_DOCTOR_MAGAGINE " +
+					"WHERE askind = 9 and pseq = ? " + 
+					"ORDER BY sort ASC ";
+		return (List<Magazine>)this.jdbcTemplate.query(query, new Object[] { seq }, this.magazineMapper);
+	}*/
+					
+
+	
+
+}

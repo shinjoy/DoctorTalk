@@ -1,0 +1,39 @@
+package kr.nomad.mars.dto;
+
+public class Userhb {
+	
+	int hbaSeq = 0;
+	String userId = "";
+	int hbaNum = 0;
+	String regDate = "";
+	String date = "";
+	public int getHbaSeq() {
+		return hbaSeq;
+	}
+	public void setHbaSeq(int hbaSeq) {
+		this.hbaSeq = hbaSeq;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public int getHbaNum() {
+		return hbaNum;
+	}
+	public void setHbaNum(int hbaNum) {
+		this.hbaNum = hbaNum;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+	public String getDate() {
+		return regDate.substring(0,10);
+	}
+	
+
+}

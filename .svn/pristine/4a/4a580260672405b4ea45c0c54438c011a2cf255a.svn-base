@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	<!--
+		어노테이션이 적용된 class( @Controller, @Service, @Repository 를 포함한 class )를 로딩
+
+		base-package로 부터 스캔을 할 때 Controller 타입은 제외 시킨다.
+		제외 시키는 이유는 spring mvc에 관련된 설정 파일은 dispatcher-servlet.xml 에서 스캔 하기 때문이다.
+
+		scoped-proxy 는 아래의 3가지를 지정할 수 있다.
+		1. no : default, proxy를 생성하지 않는다.
+		2. interface : JDK Dynamic Proxy를 이용한 Proxy 생성
+		3. targetClass : CGLIB(code generator library)를 이용한 Proxy 생성
+	 -->
+	<context:component-scan base-package="kr.nomad.mars" scoped-proxy="no">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+
+	<!-- 프로퍼티 파일을 가져온다. -->
+	<util:properties id="config" location="classpath:config.properties" />
+
+	<!-- DB 연결 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="#{config['mssql.driverClassName']}" />
+		<property name="url" value="#{config['mssql.url']}" />
+		<property name="username" value="#{config['mssql.username']}"></property>
+		<property name="password" value="#{config['mssql.password']}"></property>
+	</bean>
+	
+	<!-- Root Context: defines shared resources visible to all other web components
+	<bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="#{config['file.maxSize']}" />
+    </bean>
+     --> 
+    <bean id="userDao" class="kr.nomad.mars.dao.UserDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="magazineDao" class="kr.nomad.mars.dao.MagazineDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     <bean id="magazinepageDao" class="kr.nomad.mars.dao.MagazinePageDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="ubloodDao" class="kr.nomad.mars.dao.UbloodDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="upressDao" class="kr.nomad.mars.dao.UPressDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="uweightDao" class="kr.nomad.mars.dao.UWeightDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     <bean id="UCntDao" class="kr.nomad.mars.dao.UCntDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     <bean id="UCvriskDao" class="kr.nomad.mars.dao.UCvriskDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     <bean id="UMediDao" class="kr.nomad.mars.dao.UMediDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     <bean id="UPresDao" class="kr.nomad.mars.dao.UPresDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     <bean id="UGoalDao" class="kr.nomad.mars.dao.UGoalDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     <bean id="UBasicDao" class="kr.nomad.mars.dao.UBasicDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     <bean id="NoticeDao" class="kr.nomad.mars.dao.NoticeDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="MedExamDao" class="kr.nomad.mars.dao.MedExamDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="AnalisysDao" class="kr.nomad.mars.dao.AnalisysDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+     
+    <bean id="PointerDao" class="kr.nomad.mars.dao.PointerDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    
+    <bean id="UColDao" class="kr.nomad.mars.dao.UColDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+   
+    <bean id="UHbDao" class="kr.nomad.mars.dao.UHbDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+   
+    <bean id="PeriodDao" class="kr.nomad.mars.dao.PeriodDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+  
+    <bean id="CperiodDao" class="kr.nomad.mars.dao.CperiodDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+   
+    <bean id="EperiodDao" class="kr.nomad.mars.dao.EperiodDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="CvriskDao" class="kr.nomad.mars.dao.CvriskDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="DayDao" class="kr.nomad.mars.dao.DayDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <bean id="WeekDao" class="kr.nomad.mars.dao.WeekDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>    
+    <bean id="commentDao" class="kr.nomad.mars.dao.CommentDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>  
+       <bean id="doctorpointDao" class="kr.nomad.mars.dao.DoctorPointerDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>  
+    
+      <bean id="doctorPointerDao" class="kr.nomad.mars.dao.DoctorPointerDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    
+     <bean id="qnaDao" class="kr.nomad.mars.dao.QnaDao">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    
+    
+    
+    
+    
+</beans>
+

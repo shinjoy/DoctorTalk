@@ -1,0 +1,215 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.UserCol;
+import kr.nomad.mars.dto.Userhb;
+import kr.nomad.util.T;
+
+
+public class UHbDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper userhbMapper = new RowMapper() {
+		public Userhb mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Userhb userhb = new Userhb();
+			userhb.setHbaSeq(rs.getInt("hba_seq"));
+			userhb.setUserId(rs.getString("user_id"));
+			userhb.setHbaNum(rs.getDouble("hba_num"));
+			userhb.setRegDate(rs.getString("reg_date"));
+			userhb.setComment(rs.getString("comment"));
+			return userhb;
+		}
+	};
+	private RowMapper userhbMapper2 = new RowMapper() {
+		public Userhb mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Userhb userhb = new Userhb();
+			userhb.setHbaSeq(rs.getInt("hba_seq"));
+			userhb.setUserId(rs.getString("user_id"));
+			userhb.setHbaNum(rs.getDouble("hba_num"));
+			userhb.setRegDate(rs.getString("reg_date"));
+		
+			return userhb;
+		}
+	};
+	//당화혈색소등록
+	
+	public void addUserhb(Userhb userhb) {
+		String query = "" +
+				"INSERT INTO T_NF_USER_HBA1C " +
+				"	(user_id, hba_num, reg_date,comment) " +
+				"VALUES " +
+				"	(?, ?, getDate(),?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+		
+			userhb.getUserId(),
+			userhb.getHbaNum(),
+			userhb.getComment()
+		
+		});
+	}
+	
+	public Userhb getUserComment(int Seq) { 
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_USER_HBA1C "
+				+ "	WHERE hba_seq = ? ";
+		try {
+			return (Userhb)this.jdbcTemplate.queryForObject(query, new Object[] {Seq}, this.userhbMapper);
+		} catch (Exception e) {
+			return new Userhb();
+		}
+	}
+	
+	
+	public void updateUserhb(Userhb userhb) {
+		String query = "" + 
+				"UPDATE T_NF_USER_HBA1C SET " +
+				"	hba_num = ? " +
+				"WHERE hba_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			userhb.getHbaNum(),
+			userhb.getHbaSeq()
+		});
+	}
+	public void updateUserComment(int seq,String comment) {
+		String query = "" + 
+				"UPDATE T_NF_USER_HBA1C SET " +
+				"  comment= ? "+
+				"WHERE hba_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {comment,seq});
+	}
+	
+	//해당데이터삭제
+	public void deleteUserhb(String id) {
+		String query = "DELETE FROM T_NF_USER_HBA1C WHERE user_id = ? ";
+		this.jdbcTemplate.update(query, new Object[] { id });
+	}
+	
+	//해당 아이디 최근데이터 하나만 가지고 오기
+	public Userhb Userhb(String userId) {
+		String query = "SELECT  TOP 1  * FROM T_NF_USER_HBA1C WHERE user_id = ? ORDER BY reg_date desc";
+		
+		try {
+			return (Userhb)this.jdbcTemplate.queryForObject(query, new Object[] { userId } ,this.userhbMapper);
+		} catch (Exception e) {
+			 return new Userhb();
+		}
+		
+	}	
+	
+
+	public int getCount(String userId, String date) {
+	    String query = " SELECT COUNT(*) FROM T_NF_USER_HBA1C WHERE user_id =  ? AND convert(char(10),reg_date,120) = ?  ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] { userId, date });
+	}
+	public List<Userhb> getUserhb(String id) {
+		String query = "" + 
+				"SELECT *  " +
+				"FROM T_NF_USER_HBA1C " +
+				"WHERE user_id = ? ";
+		return (List<Userhb>)this.jdbcTemplate.query(query, new Object[] { id }, this.userhbMapper);
+	}
+	public Userhb getUserhb(String userId, String date) { 
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_USER_HBA1C "
+				+ "	WHERE user_id = ? AND convert(char(10),reg_date,120) = ? ";
+		try {
+			return (Userhb)this.jdbcTemplate.queryForObject(query, new Object[] { userId, date }, this.userhbMapper);
+		} catch (Exception e) {
+			return new Userhb();
+		}
+	}
+
+	public Userhb getUserhbRecent(String userId) { 
+		String query = ""
+				+ "	SELECT top 1* "
+				+ "	FROM T_NF_USER_HBA1C "
+				+ "	WHERE user_id = ? "
+				+ "	ORDER BY reg_date DESC ";
+		try {
+			return (Userhb)this.jdbcTemplate.queryForObject(query, new Object[] { userId }, this.userhbMapper);
+		} catch (Exception e) {
+			return new Userhb();
+		}
+	}
+
+	//해당seq 데이터삭제
+	public void deleteUserhb(int seq) {
+		String query = "DELETE FROM T_NF_USER_HBA1C WHERE hba_seq= ? ";
+		this.jdbcTemplate.update(query, new Object[] { seq });
+	}	
+	
+	//차트 데이터
+	public List<Userhb> getUserHba(String id,int page,int itemCountPerPage) { 
+			String query = ""  
+					+ "SELECT * FROM ("
+					+"select"
+					+ "		ROW_NUMBER() OVER(ORDER BY reg_date DESC) as row_seq, "
+					+ "	 * "
+					+ "	from T_NF_USER_HBA1C where user_id = ? "
+					+ ") AS a WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") +1 AND "+page+" * "+itemCountPerPage+"";
+					
+				 
+		return (List<Userhb>)this.jdbcTemplate.query(query, new Object[] { id}, this.userhbMapper);
+	}
+	// 평균
+	public Double getUseravg(String id,String now,String before) { 
+			String query = "" + 
+					"select avg(hba_num) from T_NF_USER_HBA1C where user_id = ?  and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+			return this.jdbcTemplate.queryForObject(query, new Object[] {id,before,now }, Double.class);
+}
+	//기간갯수
+	public int getUserHbacnt(String id) { 
+				String query = "" 
+						+ "SELECT count(*)  "
+						+"from T_NF_USER_HBA1C where user_id = ?";
+			
+				
+			return this.jdbcTemplate.queryForInt(query, new Object[] { id });
+	}
+	
+	///그래프
+	
+
+	public List<Userhb> getUserHba(String id,String now,String before) { 
+				String query = "" + 
+						"select top 7 * from T_NF_USER_HBA1C where user_id = ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+				return (List<Userhb>)this.jdbcTemplate.query(query, new Object[] { id,before,now },this.userhbMapper);
+	}
+	
+
+	///그래프
+	
+
+	public int getUserHbaavg(String id,String now,String before) { 
+				String query = "" + 
+						"select avg(hba_num) from T_NF_USER_HBA1C where user_id = ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+				return this.jdbcTemplate.queryForInt(query, new Object[] { id,before,now });
+	}
+	
+	public List<Userhb> getUserHba2(String id,String now,String before) { 
+		String query = ""  
+				+ "	select 0 as hba_seq, user_id,avg(hba_num) as hba_num, convert(char(10), reg_date, 120) as reg_date"
+				+ "	from T_NF_USER_HBA1C "
+				+ "		where user_id = ? and reg_date between '"+before+" 00:00:00' and '"+now+" 23:59:00'  "
+				+ "	group by user_id, convert(char(10), reg_date, 120) "
+				+ "	ORDER BY reg_date ";   
+		return (List<Userhb>)this.jdbcTemplate.query(query, new Object[] { id},this.userhbMapper2);
+}
+	
+
+}

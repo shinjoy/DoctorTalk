@@ -1,0 +1,42 @@
+package kr.nomad.mars.dto;
+
+import org.springframework.stereotype.Service;
+
+@Service("weekPointer")
+public class WeekPointer {
+	
+	public int code1(int my,int other){
+		
+		int code = 0;
+		int num = (int)(other*0.05);
+		if(other+num<my){//5%이상
+			code=1;
+			
+		}else if(my<other+num && my>other-num ){//사이 
+			code=2;
+			
+		}else{
+			code=3;
+		}
+		
+		
+	 return code;
+	}
+	
+	public int code2(int goal, int my){
+		
+		int code2=0;
+		int num =(int)(goal*0.05);
+		
+		if(goal+num<my){//5%이상
+			code2=4;
+			
+		}else if(my<num+goal &&goal-num<my ){//사이 
+			code2=5;
+			
+		}else{
+			code2=6;
+		}
+		return code2;
+	}
+}

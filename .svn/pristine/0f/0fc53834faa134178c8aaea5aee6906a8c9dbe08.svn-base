@@ -1,0 +1,65 @@
+package kr.nomad.mars.dto;
+
+public class UserMedi {
+
+	int mediSeq = 0;
+	String userId = "";
+	String mediname = "";
+	String meditime = "";
+	int medialert = 0;
+	String alertText = "";
+
+	public static int NON_NOTICE = 0; // 알림안함
+	public static int NOTICE = 1; // 알림
+
+	public String getAlertText() {
+		if (this.medialert == NON_NOTICE) {
+			return "알림안함";
+		} else if (this.medialert == NOTICE) {
+			return "알림";
+		} else {
+			return "";
+		}
+	}
+
+	public int getMediSeq() {
+		return mediSeq;
+	}
+
+	public void setMediSeq(int mediSeq) {
+		this.mediSeq = mediSeq;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getMediname() {
+		return mediname;
+	}
+
+	public void setMediname(String mediname) {
+		this.mediname = mediname;
+	}
+
+	public String getMeditime() {
+		return meditime;
+	}
+
+	public void setMeditime(String meditime) {
+		this.meditime = meditime;
+	}
+
+	public int getMedialert() {
+		return medialert;
+	}
+
+	public void setMedialert(int medialert) {
+		this.medialert = medialert;
+	}
+
+}

@@ -1,0 +1,123 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import kr.nomad.mars.dto.Push;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+public class PushDao {
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper pushMapper = new RowMapper() {
+		public Push mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Push push = new Push();
+			push.setSeq(rs.getInt("seq"));
+			push.setOs(rs.getString("os"));
+			push.setPushKey(rs.getString("push_Key"));
+			push.setMsg(rs.getString("msg"));
+			push.setMsgType(rs.getString("msg_type"));
+			push.setMsgKey(rs.getString("msg_key"));
+			push.setPushType(rs.getInt("push_type"));
+			push.setUserid(rs.getString("userId"));
+			push.setBadge(rs.getInt("badge"));
+			push.setStatus(rs.getInt("status"));
+			push.setRegDate(rs.getString("reg_date"));
+			push.setServiceId(rs.getString("service_id"));
+			push.setSender(rs.getString("sender"));
+			return push;
+		}
+	};
+
+	public void addPush(final Push push) {
+		String query = "" +
+				"INSERT INTO T_PUSH " +
+				"	(os, push_Key, msg, msg_type, msg_key, push_type, userId, badge, status, reg_date, service_id, sender) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {			
+			push.getOs(),
+			push.getPushKey(),
+			push.getMsg(),
+			push.getMsgType(),
+			push.getMsgKey(),
+			push.getPushType(),
+			push.getUserid(),
+			push.getBadge(),
+			push.getStatus(),			
+			push.getServiceId(),
+			push.getSender()
+		});
+	}
+
+	public void deletePush(String seq) {
+		String query = "DELETE FROM T_PUSH WHERE seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { seq });
+	}
+
+	public void updatePush(Push push) { 
+		String query = "" + 
+				"UPDATE T_PUSH SET " +
+				"	os = ?, " +
+				"	push_Key = ?, " +
+				"	msg = ?, " +
+				"	msg_type = ?, " +
+				"	msg_key = ?, " +
+				"	push_type = ?, " +
+				"	userId = ?, " +
+				"	badge = ?, " +
+				"	status = ?, " +
+				"	reg_date = ?, " +
+				"	service_id = ?, " +
+				"	sender = ? " +
+				"WHERE seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			push.getOs(),
+			push.getPushKey(),
+			push.getMsg(),
+			push.getMsgType(),
+			push.getMsgKey(),
+			push.getPushType(),
+			push.getUserid(),
+			push.getBadge(),
+			push.getStatus(),
+			push.getRegDate(),
+			push.getServiceId(),
+			push.getSender(),
+			push.getSeq()
+		});
+	}
+
+	public Push getPush(int seq) {
+		String query = "" + 
+				"SELECT seq, os, push_Key, msg, msg_type, msg_key, push_type, userId, badge, status, reg_date, service_id, sender " +
+				"FROM T_PUSH " +
+				"WHERE seq = ? ";
+		return (Push)this.jdbcTemplate.queryForObject(query, new Object[] { seq }, this.pushMapper);
+	}
+
+	/*
+	public List<Push> getPushList(int page, int itemCountPerPage) {
+		String query = "" +
+				"SELECT TOP "+ itemCountPerPage +" seq, os, push_Key, msg, msg_type, msg_key, push_type, userId, badge, status, reg_date, service_id ,sender " +
+				"FROM T_PUSH " +
+				"WHERE seq <= ( " +
+				"	SELECT MIN(seq) " +
+				"	FROM ( " +
+				"		SELECT TOP "+ ((page-1) * itemCountPerPage + 1) +" seq " +
+				"		FROM T_PUSH " +
+				"		ORDER BY seq DESC " +
+				"	) AS A) " +
+				"ORDER BY seq DESC";
+		return (List<Push>)this.jdbcTemplate.query(query, this.pushMapper);
+	}
+	*/
+}

@@ -1,0 +1,44 @@
+package kr.nomad.mars.dto;
+
+public class UserWeight {
+	
+	int weiSeq = 0;
+	String userId = "";
+	int weightNum = 0;
+	double bmi = 0;
+	String regDate = "";
+	public int getWeiSeq() {
+		return weiSeq;
+	}
+	public void setWeiSeq(int weiSeq) {
+		this.weiSeq = weiSeq;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public int getWeightNum() {
+		return weightNum;
+	}
+	public void setWeightNum(int weightNum) {
+		this.weightNum = weightNum;
+	}
+	
+	public double getBmi() {
+		return bmi;
+	}
+	public void setBmi(double bmi) {
+		this.bmi = bmi;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+
+	
+
+}

@@ -1,0 +1,125 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import kr.nomad.mars.dto.Alert;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+public class AlertDao {
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper alertMapper = new RowMapper() {
+		public Alert mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Alert alert = new Alert();
+			alert.setMessageSeq(rs.getInt("message_seq"));
+			alert.setUserId(rs.getString("user_id"));
+			alert.setUserName(rs.getString("user_name"));
+			alert.setMessageType(rs.getString("message_type"));
+			alert.setKeySeq(rs.getString("key_seq"));
+			alert.setContents(rs.getString("contents"));
+			alert.setPhoto(rs.getString("photo"));
+			alert.setUserPhoto(rs.getString("user_photo"));
+			alert.setRegDate(rs.getString("reg_date"));
+			alert.setViewCheck(rs.getInt("view_check"));
+			alert.setCompanySeq(rs.getInt("company_seq"));
+			alert.setCompanyName(rs.getString("company_name"));
+			return alert;
+		}
+	};
+
+	public void addAlert(final Alert alert) {
+		String query = "" +
+				"INSERT INTO T_NF_MESSAGE " +
+				"	(user_id, message_type, key_seq, contents, photo, reg_date, view_check, company_seq, company_name) " +
+				"VALUES " +
+				"	( ?, ?, ?, ?, ?, SYSDATE(), ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+				alert.getUserId(),
+				alert.getMessageType(),
+				alert.getKeySeq(),
+				alert.getContents(),
+				alert.getPhoto(),
+				alert.getViewCheck(),
+				alert.getCompanySeq(),
+				alert.getCompanyName()
+		});
+	}
+
+	public void deleteAlert(int message_seq) {
+		String query = "DELETE FROM T_NF_MESSAGE WHERE message_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { message_seq });
+	}
+
+	public void updateAlert(Alert alert) { 
+		String query = "" + 
+				"UPDATE T_NF_MESSAGE SET " +
+				"	user_id = ?, " +
+				"	message_type = ?, " +
+				"	key_seq = ?, " +
+				"	contents = ?, " +
+				"	photo = ?, " +
+				"	company_seq = ? " +
+				"WHERE message_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+				alert.getUserId(),
+				alert.getMessageType(),
+				alert.getKeySeq(),
+				alert.getContents(),
+				alert.getPhoto(),
+				alert.getCompanySeq(),
+				alert.getMessageSeq()
+		});
+	}
+
+	public void updateAlertView(String userId) { 
+		String query = "" + 
+				"UPDATE T_NF_MESSAGE SET " +
+				"	view_check = 1 " +
+				"WHERE user_id = ? ";
+		this.jdbcTemplate.update(query, new Object[] { userId });
+	}
+	
+	//알림 내역
+	public Alert getAlert(int message_seq) {
+		String query = "" + 
+				"SELECT m.*, u.user_name, u.photo as user_photo " +
+				"FROM T_NF_MESSAGE AS m LEFT OUTER JOIN T_NF_USER AS u on u.user_id = m.user_id " +
+				"WHERE m.message_seq = ? ";
+		return (Alert)this.jdbcTemplate.queryForObject(query, new Object[] { message_seq }, this.alertMapper);
+	}
+
+	//알림내역 리스트
+	public List<Alert> getAlertList(String user_id , int page, int itemCountPerPage) {
+		String query = ""
+	            + "    SELECT * FROM ( "
+	            + "        SELECT "
+	            + "            m.*, u.user_name, u.photo as user_photo "
+	            + "        FROM T_NF_MESSAGE AS m LEFT OUTER JOIN T_NF_USER AS u on u.user_id = m.user_id "
+	            + "		   WHERE m.user_id = ?  "
+	            + "		   ORDER BY  "
+	            + "    ) AS a LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+		return (List<Alert>)this.jdbcTemplate.query(query, new Object[] { user_id }, this.alertMapper);
+	}
+
+	//알림내역 리스트 갯수
+	public int getCount(String user_id) {
+		String query = " SELECT count(*) FROM T_NF_MESSAGE WHERE user_id = ? ";
+		return this.jdbcTemplate.queryForInt(query, new Object[] { user_id });
+	}
+	
+
+	//알림내역 삭제
+	public void deleteAlert(String user_id) {
+		String query = "DELETE FROM T_NF_MESSAGE WHERE user_id = ? ";
+		this.jdbcTemplate.update(query, new Object[] { user_id });
+	}
+}

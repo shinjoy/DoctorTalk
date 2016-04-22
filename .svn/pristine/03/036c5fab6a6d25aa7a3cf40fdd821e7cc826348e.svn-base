@@ -1,0 +1,49 @@
+package kr.nomad.mars.dto;
+
+public class DoctorMagagine {
+	
+	int magaSeq = 0;
+	String cotents = "";
+	String month = "";
+	String title = "";
+	String fileName = "";
+	int pseq = 0;
+	public int getMagaSeq() {
+		return magaSeq;
+	}
+	public void setMagaSeq(int magaSeq) {
+		this.magaSeq = magaSeq;
+	}
+	public String getCotents() {
+		return cotents;
+	}
+	public void setCotents(String cotents) {
+		this.cotents = cotents;
+	}
+	public String getMonth() {
+		return month;
+	}
+	public void setMonth(String month) {
+		this.month = month;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	public int getPseq() {
+		return pseq;
+	}
+	public void setPseq(int pseq) {
+		this.pseq = pseq;
+	}
+  
+
+}

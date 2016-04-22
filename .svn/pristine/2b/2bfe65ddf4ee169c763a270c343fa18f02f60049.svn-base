@@ -1,0 +1,149 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Day;
+import kr.nomad.mars.dto.Eperiod;
+import kr.nomad.mars.dto.UserCvrisk;
+import kr.nomad.mars.dto.Week;
+import kr.nomad.util.T;
+
+public class WeekDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper weekMapper = new RowMapper() {
+		public Week mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Week week = new Week();
+			week.setWeekSeq(rs.getInt("week_seq"));
+			week.setSort(rs.getInt("sort"));
+			week.setPseq(rs.getInt("pseq"));
+			week.setAskind(rs.getInt("askind"));
+			week.setComment(rs.getString("comment"));
+			week.setDiseaseId(rs.getString("disease_id"));
+			week.setMove(rs.getInt("move"));
+			week.setFileName(rs.getString("file_name"));
+			week.setAnsType(rs.getInt("ans_type"));
+			week.setWeekgroup(rs.getString("weekgroup"));
+			return week;
+		}
+	};
+
+	
+	public List<Week> getWeeklist(String group) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_WEEK " +
+				"WHERE askind = 1 and weekgroup= ? "+
+				"ORDER BY sort ASC";
+		try{
+			return (List<Week>)this.jdbcTemplate.query(query, new Object[] { group }, this.weekMapper);
+		}catch(Exception e){
+			return null;
+		}
+	}
+	
+	public List<Week> getWeekAnswerList(int seq,String group) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_WEEK " +
+				"WHERE askind = 2 and pseq = ? and  weekgroup= ?" +
+				"ORDER BY sort ASC ";
+		return (List<Week>)this.jdbcTemplate.query(query, new Object[] { seq,group }, this.weekMapper);
+	}				
+	
+	
+	
+	
+	
+	
+	/////////////////////////
+	
+	public void addWeek(final Week week) {
+		String query = "" +
+				"INSERT INTO T_NF_DOCTOR_WEEK " +
+				"	(week_seq, sort, pseq, askind, comment, disease_id, move, file_name, ans_type) " +
+				"VALUES " +
+				"	(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			week.getWeekSeq(),
+			week.getSort(),
+			week.getPseq(),
+			week.getAskind(),
+			week.getComment(),
+			week.getDiseaseId(),
+			week.getMove(),
+			week.getFileName(),
+			week.getAnsType()
+		});
+	}
+
+	public void deleteWeek(String week_seq) {
+		String query = "DELETE FROM T_NF_DOCTOR_WEEK WHERE week_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] { week_seq });
+	}
+
+	public void updateWeek(Week week) { 
+		String query = "" + 
+				"UPDATE T_NF_DOCTOR_WEEK SET " +
+				"	week_seq = ?, " +
+				"	sort = ?, " +
+				"	pseq = ?, " +
+				"	askind = ?, " +
+				"	comment = ?, " +
+				"	disease_id = ?, " +
+				"	move = ?, " +
+				"	file_name = ?, " +
+				"	ans_type = ? " +
+				"WHERE week_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			week.getWeekSeq(),
+			week.getSort(),
+			week.getPseq(),
+			week.getAskind(),
+			week.getComment(),
+			week.getDiseaseId(),
+			week.getMove(),
+			week.getFileName(),
+			week.getAnsType()
+		});
+	}
+
+	public Week getWeek(String week_seq) {
+		String query = "" + 
+				"SELECT week_seq, sort, pseq, askind, comment, disease_id, move, file_name, ans_type " +
+				"FROM T_NF_DOCTOR_WEEK " +
+				"WHERE week_seq = ? ";
+		return (Week)this.jdbcTemplate.queryForObject(query, new Object[] { week_seq }, this.weekMapper);
+	}
+
+	public List<Week> getWeekList(int page, int itemCountPerPage) {
+		String query = "" +
+				"SELECT TOP "+ itemCountPerPage +" week_seq, sort, pseq, askind, comment, disease_id, move, file_name, ans_type " +
+				"FROM T_NF_DOCTOR_WEEK " +
+				"WHERE week_seq <= ( " +
+				"	SELECT MIN(week_seq) " +
+				"	FROM ( " +
+				"		SELECT TOP "+ ((page-1) * itemCountPerPage + 1) +" week_seq " +
+				"		FROM T_NF_DOCTOR_WEEK " +
+				"		ORDER BY week_seq DESC " +
+				"	) AS A) " +
+				"ORDER BY week_seq DESC";
+		return (List<Week>)this.jdbcTemplate.query(query, this.weekMapper);
+	}
+	
+	
+	
+
+}

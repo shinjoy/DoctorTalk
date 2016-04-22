@@ -1,0 +1,112 @@
+package kr.nomad.mars.dao;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.ChatCounsel;
+import kr.nomad.mars.dto.ChatMsg;
+
+public class ChatMsgDao {
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper chatmsgMapper = new RowMapper() {
+		public ChatMsg mapRow(ResultSet rs, int rowNum) throws SQLException {
+			ChatMsg chatmsg = new ChatMsg();
+			chatmsg.setcType(rs.getInt("c_type"));
+			chatmsg.setChatMsgKey(rs.getString("chat_msg_key"));
+			chatmsg.setChatRoomSeq(rs.getInt("chat_room_seq"));
+			chatmsg.setContents(rs.getString("contents"));
+			chatmsg.setFileName(rs.getString("file_name"));
+			chatmsg.setmType(rs.getInt("m_type"));
+			chatmsg.setOption1(rs.getString("option1"));
+			chatmsg.setOption2(rs.getString("option2"));
+			chatmsg.setOption3(rs.getString("option3"));
+			chatmsg.setrCount(rs.getInt("r_count"));
+			chatmsg.setRegDate(rs.getString("reg_date"));
+			chatmsg.setSndId(rs.getString("snd_id"));
+			chatmsg.setSndName(rs.getString("snd_name"));
+			chatmsg.setStatus(rs.getInt("status"));
+			return chatmsg;
+		}
+	};
+
+	public void deleteChatMsg(String chat_msg_key) {
+		String query = "DELETE FROM T_NF_CHAT_MSG WHERE chat_msg_key = ? ";
+		this.jdbcTemplate.update(query, new Object[] { chat_msg_key });
+	}
+
+	public ChatMsg getChatMsg(String chat_msg_key) {
+		String query = "" + 
+				"SELECT c_type, chat_msg_key, chat_room_seq, contents, file_name, m_type, option1, option2, option3, r_count, reg_date, snd_id, status " +
+				"FROM T_NF_CHAT_MSG " +
+				"WHERE chat_msg_key = ? ";
+		return (ChatMsg)this.jdbcTemplate.queryForObject(query, new Object[] { chat_msg_key }, this.chatmsgMapper);
+	}
+
+	public List<ChatMsg> getChatMsg(int chatRoomSeq) {
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "		SELECT m.*, u.user_name as snd_name "
+				+ "		FROM T_NF_CHAT_MSG as m left outer join T_NF_USER as u on u.user_id = m.snd_id "
+				+ "		WHERE chat_room_seq = ? "
+				+ "		ORDER BY chat_msg_key DESC "
+				+ "	) as t "
+				+ "	ORDER BY t.chat_msg_key ASC ";
+		return (List<ChatMsg>)this.jdbcTemplate.query(query, new Object[] { chatRoomSeq }, this.chatmsgMapper);
+	}
+
+	
+	public List<ChatMsg> getChatMsgList(int chatRoomSeq, int page, int itemCountPerPage) {
+		String query = ""
+				+ "    SELECT * FROM ( "
+				+ "			SELECT m.*, u.user_name as snd_name "
+				+ "			FROM T_NF_CHAT_MSG as m left outer join T_NF_USER as u on u.user_id = m.snd_id "
+				+ "			WHERE chat_room_seq = ? "
+				+ "			ORDER BY chat_msg_key DESC "
+				+ "    ) AS a LIMIT " + (page - 1) * itemCountPerPage + "," + itemCountPerPage;
+		return (List<ChatMsg>)this.jdbcTemplate.query(query, new Object[] { chatRoomSeq }, this.chatmsgMapper);
+	}
+	public int getCount(int chatRoomSeq) {
+		String query = " SELECT COUNT(*) FROM T_NF_CHAT_MSG WHERE chat_room_seq = ? ";
+		return this.jdbcTemplate.queryForInt(query, new Object[] { chatRoomSeq });
+	}
+	
+	public List<ChatMsg> getChatMsgLast3(int chatRoomSeq) {
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "		SELECT m.*, u.user_name as snd_name "
+				+ "		FROM T_NF_CHAT_MSG as m left outer join T_NF_USER as u on u.user_id = m.snd_id "
+				+ "		WHERE chat_room_seq = ? "
+				+ "		ORDER BY chat_msg_key DESC "
+				+ "		LIMIT 3 "
+				+ "	) as t "
+				+ "	ORDER BY t.chat_msg_key ASC ";
+		return (List<ChatMsg>)this.jdbcTemplate.query(query, new Object[] { chatRoomSeq }, this.chatmsgMapper);
+	}
+
+	public ChatMsg getChatMsgLast1(int chatRoomSeq) {
+		String query = ""
+				+ "	SELECT * FROM ( "
+				+ "		SELECT m.*, u.user_name as snd_name "
+				+ "		FROM T_NF_CHAT_MSG as m left outer join T_NF_USER as u on u.user_id = m.snd_id "
+				+ "		WHERE chat_room_seq = ? and contents not like '%{%' "
+				+ "		ORDER BY chat_msg_key DESC "
+				+ "		LIMIT 1 "
+				+ "	) as t "
+				+ "	ORDER BY t.chat_msg_key ASC ";
+		try {
+			return (ChatMsg)this.jdbcTemplate.queryForObject(query, new Object[] { chatRoomSeq }, this.chatmsgMapper);
+		} catch (Exception e) {
+			return new ChatMsg();
+		}
+	}
+}

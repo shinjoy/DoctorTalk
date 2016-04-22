@@ -1,0 +1,173 @@
+@CHARSET "UTF-8";
+
+/* TABLE - SIMPLE WHITE */
+
+table.simpleWhite {
+	background:#fff;
+	border-top:1px solid #bbb;
+	border-collapse: collapse;
+}
+table.simpleWhite thead tr th {
+	height:#fff;
+	font-weight:bold;
+}
+table.simpleWhite tr {
+	border-bottom:1px solid #ddd;
+}
+table.simpleWhite tr:last-child {
+	border-bottom:1px solid #bbb;
+}
+table.simpleWhite th,
+table.simpleWhite td {
+	border-bottom:1px solid #ddd;
+	padding:4px;
+	color:#777;
+}
+table.simpleWhite th.center,
+table.simpleWhite td.center {
+	text-align:center;
+}
+table.simpleWhite th.left,
+table.simpleWhite td.left {
+	text-align:left;
+}
+table.simpleWhite th.right,
+table.simpleWhite td.right {
+	text-align:right;
+}
+table.simpleWhite td.nodata {
+	height:100px;
+}
+
+/* TABLE - NORMAL - LIST */
+table.list { 
+	clear:both;
+	border:1px solid #cfceca;
+	border-collapse: collapse;
+	width:100%;
+	vertical-align:top;
+}
+table.list thead { 
+	width:100%;
+	border:1px solid #64737c;
+	border-bottom:1px solid #fff;
+}
+table.list thead tr {
+	height:31px
+}
+table.list thead tr th {
+	color:#fff;
+	font-weight:bold;
+	background-color:#64737c;
+}
+table.list tbody {
+	width:100%;
+	border-left:1px solid #cfceca;
+	border-right:1px solid #cfceca;
+}
+table.list tbody tr {
+	border-bottom:1px solid #cfceca;
+	height:30px;
+}
+table.list tbody tr td {
+	border-bottom:1px solid #cfceca;
+	border-right:1px solid #dcdcdc;
+	text-align:center;
+	padding:3px;
+}
+table.list tbody tr td.left {
+	text-align:left;
+}
+table.list tbody tr td.right {
+	text-align:right;
+}
+/*
+table.list tbody tr:hover td {
+	background-color:#fff0da;
+	cursor:text;
+}
+*/
+
+/* TABLE - SLIM - LIST */
+table.slim thead { 
+	border:0;
+	background:#999;
+}
+table.slim thead tr {
+	height:24px
+}
+table.slim thead tr th {
+	color:#fff;
+	font-weight:bold;
+}
+table.slim tbody tr {
+	height:24px;
+}
+
+
+
+table.setup tr th {border:1px solid #c9c9c9; background-color:#e4e4e4; font-weight:bold; color:#555;}
+table.setup tr td {text-align:left; padding-left:30px; height:40px;}
+table.setup input.mar {margin:0px 10px 2px 0px}
+
+/* TABLE - INFO BOX */
+table.info { 
+	clear:both;
+	width:100%;
+	vertical-align:top;
+}
+table.info th {
+	color:#999;
+	text-align:right;
+	padding:5px 10px;
+	border-bottom:1px solid #ddd;
+}
+table.info tr:first-child th {
+	border-top:1px solid #ddd;
+}
+table.info td {
+	color:#333;
+	text-align:left;
+	padding:5px 10px;
+	border-bottom:1px solid #ddd;
+}
+table.info tr:first-child td {
+	border-top:1px solid #ddd;
+}
+
+/* TABLE - EDIT FORM */
+table.edit {
+	border:0;
+	border-collapse: collapse;
+	width:100%;
+	vertical-align:top;
+	margin:10px 50px 10px 10px;
+}
+table.edit thead {
+	border:0;
+	width:100%;
+}
+table.edit thead tr {
+	height:40px
+}
+table.edit thead tr th {
+	color:#fff;
+	font-weight:bold;
+}
+table.edit tbody {
+	border:0;
+	width:100%;
+}
+table.edit tbody tr {
+	border:0;
+	height:30px;
+}
+table.edit tbody tr td {
+	border:0;
+	text-align:left;
+	padding:3px;
+}
+table.edit tbody tr td:first-child {
+	text-align:right
+}
+

@@ -1,0 +1,78 @@
+package kr.nomad.mars.dao;
+
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.Period;
+import kr.nomad.mars.dto.Pointer;
+import kr.nomad.util.T;
+
+
+public class PeriodDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper periodMapper = new RowMapper() {
+		public Period mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Period period = new Period();
+			period.setPreSeq(rs.getInt("pre_seq"));
+			period.setSort(rs.getInt("sort"));
+			period.setDiseaseId(rs.getString("disease_id"));
+			period.setComment(rs.getString("comment"));
+			period.setKind(rs.getInt("kind"));
+			period.setPseq(rs.getInt("pseq"));
+			period.setAskind(rs.getInt("askind"));
+			period.setMove(rs.getInt("move"));
+			period.setValue(rs.getString("value"));
+			return period;
+		}
+	};
+	
+	public List<Period> getPeriod(int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_PERIOD " +
+				"WHERE askind = 1 and kind= ? "+
+				"ORDER BY sort ASC";
+		return (List<Period>)this.jdbcTemplate.query(query, new Object[] { kind }, this.periodMapper);
+	}
+	
+	public List<Period> getPeriodAnswerList(int kind) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_PERIOD " +
+				"WHERE askind = 2 and kind= ? "+ 
+				"ORDER BY sort ASC ";
+		return (List<Period>)this.jdbcTemplate.query(query, new Object[] { kind }, this.periodMapper);
+	}	
+
+	public Period getPeriodAnswer(String id) {
+		String query = "" + 
+				"SELECT * " +
+				"FROM T_NF_DOCTOR_PERIOD " +
+				"WHERE disease_id = ? " ;
+		
+		try {
+			return (Period)this.jdbcTemplate.queryForObject(query, new Object[] { id }, this.periodMapper);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+	}	
+	
+	
+	
+
+}

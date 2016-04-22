@@ -1,0 +1,73 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ include file="/WEB-INF/views/common/header5.jsp"  %>
+	
+<script type="text/javascript">
+$(document).ready(function() {
+	searchList(searchForm);
+});
+
+function searchList(frm) {
+	var param = {
+	    keyword : frm.keyword.value
+	};
+	$.ajax({
+	    type:"POST",
+	    url:"/chat/script_list.go",
+	    dataType:"json",
+	    data:param,
+	    success:function(json) {
+	        var list = json.list;
+	        var str = "";
+	        for (var i=0; i<list.length; i++) {
+	        	str += '<li onclick="callScript(\''+ list[i].script +'\');">'+ list[i].script +'</li>';
+	        }
+	        $(".search-result").html(str);
+	    },
+	    error:function(xhr, status, error) {
+	        alert(error);
+	    },
+	    complete:function(data) {
+	    }
+	});
+	return false;
+}
+
+//초대회원 선택
+function callScript(txt) {
+	window.location = "jscall://callScript?"+txt;
+	pop.close();
+}
+
+</script>
+<style>
+	#pop-box { padding:0; }
+	.pop-tool { position:relative; border-bottom:1px solid #aaa; margin-top:10px; padding:0 10px; }
+	.pop-tool .user-photo { width:60px; height:60px; margin:10px auto; }
+	.pop-tool .close-btn { position:absolute; top:0; right:0; }
+	.script-search { height:40px; }
+	.search-list { width:300px; height:200px; overflow-y:auto; }
+	.search-list li { padding:10px; border-bottom:1px solid #ddd; }
+</style>
+
+</head>
+
+<body>
+
+	<form method="post" name="searchForm" onsubmit="return searchList(this); return false;">
+	<div class="pop-tool">
+		<div class="script-search">
+			<input type="text" class="itext" name="keyword">
+			<button type="submit" class="btn">검색</button> 
+		</div>
+		<div class="close-btn"><img src="/images/lay_close.png" class="btn-close" onclick="pop.close();"></div>
+	</div>
+	</form>
+
+	<div class="search-list">
+		<ul class="search-result">
+		</ul>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ include file="/WEB-INF/views/common/header.jsp"  %>
+
+<script type="text/javascript">
+	
+	$(document).ready(function() {
+		aside.setActive(1,1);
+	});
+	
+
+	function submitForm(frm) {
+		
+		var use = frm.use.value;
+		
+		for(var i=0; i<use.length; i++)
+		{
+		    if(use[i].checked == true) { 
+		    }
+		}
+		
+		if (frm.use.value == "") {
+			alert("사용 여부를 선택해주세요.");
+			return false;
+		}
+
+		var param = {
+			use : frm.use.value,
+			userId : frm.userId.value
+		};
+		
+		$.ajax({
+			type:"POST",
+			url:"/admin/user/user_edit_do.go",
+			dataType:"json",
+			data:param,
+			success:function(json){
+				alert(json.message);
+				if (json.result) {
+					document.location.href = "/admin/user/user.go";
+				}
+			}
+		});
+
+		return false;
+	}
+	
+	
+	function deleteUser(userId) {
+		if(confirm("회원을 삭제합니다. 회원의 모든 활동내역이 제거됩니다. 삭제된 내용은 복구될 수 없습니다. 삭제를 진행하시겠습니까?")) {
+			var param = {
+					userId	:	userId
+			};
+			
+			$.ajax({
+				type:"POST",
+				url:"/admin/user/user_delete_do.go",
+				dataType:"json",
+				data:param,
+				success:function(json){
+					alert(json.message);
+					if (json.result) {
+						document.location.href = "/admin/user/user.go";
+					}
+				}
+			});
+		}
+		return false;
+	}
+	
+
+</script>
+
+<style>
+table.register th {
+   vertical-align: top;
+   text-align: right;
+   padding:10px;
+   font-weight: bold;
+}
+
+table.register td {
+	padding:10px;
+    vertical-align: top;
+}	
+.tbl-list TD{
+	border-bottom: 1px solid #ddd;
+	padding: 5px;
+}
+</style>
+</head>
+<body>
+
+<%@ include file="/WEB-INF/views/admin/admin_header.jsp"  %>
+
+<section class="main-cover main-row">
+	<section id="main">
+		
+		<%@ include file="/WEB-INF/views/admin/admin_menu.jsp"  %>
+
+		<section id="contents">
+			<header class="panel">
+				 ■ 홈 > 회원관리 > 일반회원 수정/삭제하기
+			</header>
+		
+			<div class="contents-block">
+			
+				<h1>일반회원 수정/삭제하기</h1>
+				
+				<div class="contents-main">
+
+					<div class="contents-box">
+				
+						<form method="post" name="firmForm" onsubmit="return submitForm(this); return false;">
+						<input type="hidden" name="userId" value="${user.userId}">
+							<table class="register">
+								<tr>
+									<td rowspan="8">
+										<img src="/images/1305920150807132159.jpg" style="height:100px;">	
+<%-- 										<img src="/files/company/thumb/${it.photo1}" style="height:100px;"> --%>
+									</td>
+									<td>${user.userName}</td>
+								</tr>
+								<tr>
+									<td>${user.genderText}|${user.userAge}|${user.area}</td>
+								</tr>
+								<tr>
+									<td>포인트 : ${user.point}<button class="btn" style="margin-left:10px; margin-top:-5px;">환급처리</button></td>
+								</tr>
+								<tr>
+									<td>F-MONEY : ${user.income}</td>
+								</tr>
+								<tr>
+									<td>최근 접속 : ${it.lastLogindate.substring(0,10)}&nbsp;&nbsp;&nbsp;등록일자 : ${it.regDate.substring(0,10)}</td>
+								</tr>
+								<tr>
+									<td>하느님이 보우하사 우리나라만세</td>
+								</tr>
+								<tr>
+									<td>
+										<label style="margin-right:10px;"><input type="radio" name="use" value="1" ${it.status == 1 ? 'checked=\"checked\"' : ''}>사용 가능</label>
+										<label><input type="radio" name="use" value="3" ${it.status == 3 ? 'checked=\"checked\"' : ''}>로그인 차단</label>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				<br><br>
+					<div  class="btn-tools" >	
+						<button type="submit" class="btn" >수정</button>
+						<button type="button" class="btn" onclick="deleteUser('${user.userId}');">삭제</button>
+						<button type="button" class="btn" onclick="document.location.href='/admin/user/user.go';">목록</button>
+					</div>
+				</form>
+			</div>
+		</section>
+	</section>
+</section>
+
+<%@ include file="/WEB-INF/views/admin/admin_footer.jsp"  %>
+
+</body>
+</html>

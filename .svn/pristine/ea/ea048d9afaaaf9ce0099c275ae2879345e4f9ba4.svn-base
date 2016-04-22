@@ -1,0 +1,121 @@
+// owl swiper 포맷 옵션
+
+function logout() {
+	if (window.MYAPP != undefined ) {
+		window.MYAPP.saveUserId("");
+	}
+	document.location.href = "/logout_do.go";
+}
+
+var popCtrl = {
+	closePop:function() {
+		$("#popup_mask").css("display","none");
+		$("#popup").css("display","none");
+		$("#popup layer").html("");
+	},
+	openPop:function() {
+		$("#popup_mask").css("display","block");
+		$("#popup").css("display","block");
+	},
+};
+	
+	//시안크게보기 팝업
+	function draftContentsPop(drSeq,drcSeq) {
+		popCtrl.openPop();
+		$(".pop_layer").html("");
+		$.ajax({
+			type:"POST",
+			url:"/admin/design/design_plan_image_list.go?drSeq="+drSeq+"&drcSeq="+drcSeq,
+			dataType:"json",
+			success:function(json){
+				//console.log(json);
+				var photo = "";
+				photo += '<div class="tbl-list" style="max-height:400px;overflow-y:auto;">';
+				photo += '	<table>';
+				photo += '	<thead><tr><th>'+json.list[0].name+' | '+json.list[0].season+'</th></thead>';
+				photo += '	<tbody>';
+				for (var i = 0; i < json.list.length; i++) {
+					var contents = json.list[i];
+					photo += '		<tr><td><span style="display:inline-block;margin:0 20px;">'+contents.formType+' | '+contents.specName+'</span>';
+					photo += '				<img src="'+contents.imagePath+''+contents.imageName+'" style="max-width:90%;max-height:350px;border:2px solid #333; margin:10px;"></td></tr>';
+				}
+				photo += '	</tbody>';
+				photo += '	</table>';
+				photo += '</div>';
+				$(".pop_layer").html(photo);
+			}
+		});
+	}
+
+	/* 우편번호 검색 */
+	var isShowPostSearch = false;
+	function showPostSearch() {
+		if (isShowPostSearch == false) {
+			$("#post_code_search").css("display","inline-block");
+		} else {
+			$("#post_code_search").css("display","none");
+		}
+		isShowPostSearch = !isShowPostSearch;
+	}
+	var addressList = new Array();
+	function searchDong(frm) {
+		if (frm.dong.value=="") {
+			alert("읍/면/동을 검색해주세요.");
+			return false;
+		}
+		$.ajax({
+			type:"POST",
+			url:"/postcode_search.go",
+			dataType:"json",
+			data:"dong="+frm.dong.value,
+			success:function(json) {
+				addressList = json.addressList;
+				var str = '';
+				for(var i=0; i<addressList.length;i++) {
+					str += '<option value="'+i+'">'+ addressList[i].address +'</option>';
+				}
+				$("#post_code_select").html(str);
+			}
+		});
+	}
+	function selectAddress(frm,obj) {
+		var address = addressList[obj.value];
+		var postcode1 = address.postcode.toString().substring(0,3);
+		var postcode2 = address.postcode.toString().substring(3,6);
+		frm.postcode1.value = postcode1;
+		frm.postcode2.value = postcode2;
+		frm.address1.value = address.sido +" "+ address.gugun +" "+ address.dong;
+		frm.address2.value = address.building;
+	}
+	
+	/* 아이디 중복검사 */
+	function idDupCheck(frm) {
+		var userId = frm.userId.value;
+		if (!validEngNum(userId)) {
+			$(".id_check").html("영문,숫자만 입력가능합니다.");
+			$(".id_check").css("color","#f00");
+			frm.idCheck.value = 0;
+		} else if (userId.length < 3 || userId.length > 20) {
+			$(".id_check").html("3자 이상 20자 이하로 입력하세요.");
+			$(".id_check").css("color","#f00");
+			frm.idCheck.value = 0;
+		} else {
+			$.ajax({
+				type:"POST",
+				url:"/id_dup_check.go",
+				dataType:"json",
+				data:"userId="+frm.userId.value,
+				success:function(json) {
+					if(json.result) {
+						$(".id_check").html("이미 사용중인 ID입니다.");
+						$(".id_check").css("color","#f00");
+						frm.idCheck.value = 0;
+					} else {
+						$(".id_check").html("사용할 수 있는 ID입니다.");
+						$(".id_check").css("color","#00f");
+						frm.idCheck.value = 1;
+					}
+				}
+			});
+		}
+	}

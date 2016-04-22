@@ -1,0 +1,110 @@
+package kr.nomad.mars.dto;
+
+public class ReportHistory {
+	int reportSeq = 0;
+	String userId = "";
+	String reportDate = "";
+	int reportType = 0;
+	int reportIdx = 0;
+	String bloodCount = "";
+	String bloodTargetCount = "";
+	int bloodPercent = 0;
+	String pressureCount = "";
+	String pressureTargetCount = "";
+	int pressurePercent = 0;
+	String weightCount = "";
+	String weightTargetCount = "";
+	int weightPercent = 0;
+	String regDate = "";
+	public int getReportSeq() {
+		return reportSeq;
+	}
+	public void setReportSeq(int reportSeq) {
+		this.reportSeq = reportSeq;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getReportDate() {
+		return reportDate;
+	}
+	public void setReportDate(String reportDate) {
+		this.reportDate = reportDate;
+	}
+	public int getReportType() {
+		return reportType;
+	}
+	public void setReportType(int reportType) {
+		this.reportType = reportType;
+	}
+	public int getReportIdx() {
+		return reportIdx;
+	}
+	public void setReportIdx(int reportIdx) {
+		this.reportIdx = reportIdx;
+	}
+	public String getBloodCount() {
+		return bloodCount;
+	}
+	public void setBloodCount(String bloodCount) {
+		this.bloodCount = bloodCount;
+	}
+	public String getBloodTargetCount() {
+		return bloodTargetCount;
+	}
+	public void setBloodTargetCount(String bloodTargetCount) {
+		this.bloodTargetCount = bloodTargetCount;
+	}
+	public int getBloodPercent() {
+		return bloodPercent;
+	}
+	public void setBloodPercent(int bloodPercent) {
+		this.bloodPercent = bloodPercent;
+	}
+	public String getPressureCount() {
+		return pressureCount;
+	}
+	public void setPressureCount(String pressureCount) {
+		this.pressureCount = pressureCount;
+	}
+	public String getPressureTargetCount() {
+		return pressureTargetCount;
+	}
+	public void setPressureTargetCount(String pressureTargetCount) {
+		this.pressureTargetCount = pressureTargetCount;
+	}
+	public int getPressurePercent() {
+		return pressurePercent;
+	}
+	public void setPressurePercent(int pressurePercent) {
+		this.pressurePercent = pressurePercent;
+	}
+	public String getWeightCount() {
+		return weightCount;
+	}
+	public void setWeightCount(String weightCount) {
+		this.weightCount = weightCount;
+	}
+	public String getWeightTargetCount() {
+		return weightTargetCount;
+	}
+	public void setWeightTargetCount(String weightTargetCount) {
+		this.weightTargetCount = weightTargetCount;
+	}
+	public int getWeightPercent() {
+		return weightPercent;
+	}
+	public void setWeightPercent(int weightPercent) {
+		this.weightPercent = weightPercent;
+	}
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+
+}

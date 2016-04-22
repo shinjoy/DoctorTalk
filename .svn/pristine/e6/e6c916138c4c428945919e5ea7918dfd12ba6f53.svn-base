@@ -1,0 +1,91 @@
+package kr.nomad.mars.dto;
+
+public class UserBasic {
+	
+	int basicSeq = 0;
+	String userId = "";
+	int gender = 0;
+	int height = 0;
+	int weight = 0;
+	int waist = 0;
+	int smoke = 0;
+	String blood = "";
+	String press="";
+	String col ="";
+	String regDate ="";
+	
+	
+	
+	
+	public int getBasicSeq() {
+		return basicSeq;
+	}
+	public void setBasicSeq(int basicSeq) {
+		this.basicSeq = basicSeq;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	
+	public int getGender() {
+		return gender;
+	}
+	public void setGender(int gender) {
+		this.gender = gender;
+	}
+	public int getHeight() {
+		return height;
+	}
+	public void setHeight(int height) {
+		this.height = height;
+	}
+	public int getWeight() {
+		return weight;
+	}
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+	public int getWaist() {
+		return waist;
+	}
+	public void setWaist(int waist) {
+		this.waist = waist;
+	}
+	public int getSmoke() {
+		return smoke;
+	}
+	public void setSmoke(int smoke) {
+		this.smoke = smoke;
+	}
+	public String getBlood() {
+		return blood;
+	}
+	public void setBlood(String blood) {
+		this.blood = blood;
+	}
+	
+	public String getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(String regDate) {
+		this.regDate = regDate;
+	}
+	public String getPress() {
+		return press;
+	}
+	public void setPress(String press) {
+		this.press = press;
+	}
+	public String getCol() {
+		return col;
+	}
+	public void setCol(String col) {
+		this.col = col;
+	}
+    
+	
+
+}

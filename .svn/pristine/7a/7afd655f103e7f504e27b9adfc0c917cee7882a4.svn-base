@@ -1,0 +1,265 @@
+package kr.nomad.mars.dao;
+
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import kr.nomad.mars.dto.UserPress;
+import kr.nomad.mars.dto.UserWeight;
+import kr.nomad.util.T;
+
+public class UWeightDao {
+	
+	private JdbcTemplate jdbcTemplate;
+	public void setDataSource(DataSource dataSource) {
+	    this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	private RowMapper userweightMapper = new RowMapper() {
+		public UserWeight mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserWeight userweight = new UserWeight();
+			userweight.setWeiSeq(rs.getInt("wei_seq"));
+			userweight.setUserId(rs.getString("user_id"));
+			userweight.setWeightNum(rs.getInt("weight_num"));
+			userweight.setBmi(rs.getFloat("bmi"));
+			userweight.setRegDate(rs.getString("reg_date"));
+			userweight.setBmd(rs.getFloat("bmd"));
+			userweight.setEquip(rs.getInt("equip"));
+			userweight.setMuscle(rs.getFloat("muscle"));
+			userweight.setTbw(rs.getFloat("tbw"));
+			userweight.setBbmi(rs.getFloat("bbmi"));
+			return userweight;
+		}
+	};
+	
+	private RowMapper userweightMapper2 = new RowMapper() {
+		public UserWeight mapRow(ResultSet rs, int rowNum) throws SQLException {
+			UserWeight userweight = new UserWeight();
+			userweight.setWeiSeq(rs.getInt("wei_seq"));
+			userweight.setUserId(rs.getString("user_id"));
+			userweight.setWeightNum(rs.getInt("weight_num"));
+			userweight.setBmi(rs.getFloat("bmi"));
+			userweight.setRegDate(rs.getString("reg_date"));
+			userweight.setEquip(rs.getInt("equip"));
+		
+			return userweight;
+		}
+	};
+	
+	
+	
+	//해당 아이디의 해당 년월에  측정 수 
+	
+	public int getUserWeightList(String id,String ym) {
+		
+		String query = "SELECT COUNT(*) FROM T_NF_USER_WEIGHT "
+				+ "WHERE user_id = ? and substring(convert(varchar(10),reg_date,120), 0, 8) = ?";
+		
+		try {
+			return this.jdbcTemplate.queryForInt(query, new Object[] { id , ym });
+		
+		} catch (Exception e) {
+		// TODO: handle exception
+		return -1;
+		}
+	}
+
+	//데이터삭제
+	public void deleteUserWeight(String id) {
+		
+		String query = "DELETE FROM T_NF_USER_WEIGHT WHERE user_id = ? ";
+		
+		try {
+				this.jdbcTemplate.update(query, new Object[] { id });
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+	
+	public void addUserWeight(UserWeight userweight) {
+		String query = "" +
+				"INSERT INTO T_NF_USER_WEIGHT " +
+				"	(user_id, weight_num, bmi, reg_date, bmd, equip, muscle ,tbw, bbmi) " +
+				"VALUES " +
+				"	(?, ?, ?, getDate(), ?, ?, ?, ?, ?) ";
+		this.jdbcTemplate.update(query, new Object[] {
+			
+			userweight.getUserId(),
+			userweight.getWeightNum(),
+			userweight.getBmi(),
+			userweight.getBmd(),
+			userweight.getEquip(),
+			userweight.getMuscle(),
+			userweight.getTbw(),
+			userweight.getBbmi()
+
+		});
+	}
+	
+	public void updateUserWeight(UserWeight userweight) {
+		String query = "" + 
+				"UPDATE T_NF_USER_WEIGHT SET " +
+				"	weight_num = ?, " +
+				"	bmi = ?, " +
+				"	bmd = ?, " +
+				"	equip = ?, " +
+				"	muscle = ?, " +
+				"	tbw = ?, " +
+				"  bbmi= ?"+
+				"WHERE wei_seq = ? ";
+		this.jdbcTemplate.update(query, new Object[] {
+			userweight.getWeightNum(),
+			userweight.getBmi(),
+			userweight.getBmd(),
+			userweight.getEquip(),
+			userweight.getMuscle(),
+			userweight.getTbw(),
+			userweight.getBbmi(),
+			userweight.getWeiSeq()
+		});
+	}
+	
+	public List<UserWeight> getUserWeight(String id) {
+		String query = "" + 
+				"SELECT *" +
+				"FROM T_NF_USER_WEIGHT " +
+				"WHERE user_id = ? ";
+		return (List<UserWeight>)this.jdbcTemplate.query(query, new Object[] { id }, this.userweightMapper);
+	}
+	
+	
+	
+	/** 유저의 전체 체중 데이터 갯수 **/
+	public int getCount(String userId) {
+	    String query = " SELECT COUNT(*) FROM T_NF_USER_WEIGHT WHERE user_id =  ?  ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] {userId});
+	}
+	public int getCount(String userId, String date) {
+	    String query = " SELECT COUNT(*) FROM T_NF_USER_WEIGHT WHERE user_id =  ? AND convert(char(10),reg_date,120) = ?  ";
+	    return this.jdbcTemplate.queryForInt(query, new Object[] { userId, date });
+	}
+	
+	//seq 삭제
+	public void deleteUserWeight(int seq) {
+		
+		String query = "DELETE FROM T_NF_USER_WEIGHT WHERE wei_seq = ? ";
+		
+		try {
+				this.jdbcTemplate.update(query, new Object[] { seq });
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	
+	//차트데이터
+	public List<UserWeight> getUserWeight(String id,int page,int itemCountPerPage) { 
+			String query = ""  
+					+ "SELECT * FROM ("
+					+ "select"
+					+ "		ROW_NUMBER() OVER(ORDER BY reg_date DESC) as row_seq, "
+					+"*"
+					+"from T_NF_USER_WEIGHT "
+					+ "where user_id = ?"
+					+ ") AS a WHERE row_seq BETWEEN (("+page+" - 1) * "+itemCountPerPage+") +1 AND "+page+" * "+itemCountPerPage+"";; 
+		return (List<UserWeight>)this.jdbcTemplate.query(query, new Object[] { id }, this.userweightMapper);
+	}
+	public UserWeight getUserWeight(String userId, String date) { 
+		String query = ""
+				+ "	SELECT * "
+				+ "	FROM T_NF_USER_WEIGHT "
+				+ "	WHERE user_id = ? AND convert(char(10),reg_date,120) = ? ";
+		try {
+			return (UserWeight)this.jdbcTemplate.queryForObject(query, new Object[] { userId, date }, this.userweightMapper);
+		} catch (Exception e) {
+			return new UserWeight();
+		}
+	}
+	//차트데이터 갯수
+	public int getUserWeightcnt(String id) { 
+			String query = "" + 
+					"select COUNT(*) from T_NF_USER_WEIGHT where user_id = ? "; 
+			return this.jdbcTemplate.queryForInt(query, new Object[] { id});
+	}
+	
+	
+	//1주 지표 갯수
+	public int getUserWeightcnt(String id,String now,String before) { 
+		String query = "" + 
+				"select COUNT(*) from T_NF_USER_WEIGHT where user_id = ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+		return this.jdbcTemplate.queryForInt(query, new Object[] { id,before,now });
+	}		
+	
+	
+
+	//bmi 평균
+	public int getUserWeighavg(String id,String now,String before) { 
+			String query = "" + 
+					"select avg(bmi) from T_NF_USER_WEIGHT where user_id = ?  and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+			return this.jdbcTemplate.queryForInt(query, new Object[] {id,before,now });
+	}
+	//체중 평균
+		public int getUseravg(String id,String now,String before) { 
+				String query = "" + 
+						"select avg(weight_num) from T_NF_USER_WEIGHT where user_id = ?  and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+				return this.jdbcTemplate.queryForInt(query, new Object[] {id,before,now });
+	}
+		
+	//타입별 타인지표 평균
+	public int getotherWeighavg(String now,String before) { 
+			String query = "" + 
+					"select avg(bmi) from T_NF_USER_WEIGHT where reg_date between ? +' 00:00:00' and ? +' 23:59:00'"; 
+			return this.jdbcTemplate.queryForInt(query, new Object[] {before,now });
+	}	
+	
+	//그래프
+	public List<UserWeight> getUserWeight(String id,String now,String before) { 
+			String query = "" + 
+					"select top 7 * from T_NF_USER_WEIGHT where user_id = ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'";
+				/*	+ "	select 0 as wei_seq, user_id, avg(weight_num) as weight_num, avg(bmi) as bmi, avg(dplessure) as dplessure, convert(char(10), reg_date, 120) as reg_date, 0 as equip "
+					+ "	from T_NF_USER_WEIGHT "
+					+ "		where user_id = ? and reg_date between '"+before+" 00:00:00' and '"+now+" 23:59:00'  "
+					+ "	group by user_id, convert(char(10), reg_date, 120) "
+					+ "	ORDER BY reg_date "; ; */
+			return (List<UserWeight>)this.jdbcTemplate.query(query, new Object[] { id,before,now },this.userweightMapper);
+	}
+	
+	//그래프
+	public List<UserWeight> getUserWeight2(String id,String now,String before) { 
+				String query = ""  
+						//"select top 7 * from T_NF_USER_WEIGHT where user_id = ? and reg_date between ? +' 00:00:00' and ? +' 23:59:00'"
+						+ "	select 0 as wei_seq, user_id, avg(weight_num) as weight_num, avg(bmi) as bmi, convert(char(10), reg_date, 120) as reg_date, 0 as equip "
+						+ "	from T_NF_USER_WEIGHT "
+						+ "	where user_id = ? and reg_date between '"+before+" 00:00:00' and '"+now+" 23:59:00'  "
+						+ "	group by user_id, convert(char(10), reg_date, 120) "
+						+ "	ORDER BY reg_date "; 
+				
+				return (List<UserWeight>)this.jdbcTemplate.query(query, new Object[] { id },this.userweightMapper2);
+	}
+	
+	//체중 업데이트
+	
+
+	public void updateUWeight(UserWeight userweight) {
+		String query = "" + 
+				"UPDATE T_NF_USER_WEIGHT SET " +
+				"	weight_num = ?, " +
+				"	bmi = ? " +
+				"WHERE wei_seq = (select max(wei_seq) from T_NF_USER_WEIGHT where user_id = ?)  ";
+		this.jdbcTemplate.update(query, new Object[] {
+			userweight.getWeightNum(),
+			userweight.getBmi(),
+			userweight.getUserId()
+		});
+	}
+	
+
+
+}
